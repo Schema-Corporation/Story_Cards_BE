@@ -1,0 +1,16 @@
+version: '3.7'
+services:
+  database:
+    image: mysql
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'db_story_cards'
+      MYSQL_USER: 'user'
+      MYSQL_PASSWORD: 'password'
+      MYSQL_ROOT_PASSWORD: 'password'
+    ports:
+      - '3307:3306'
+      - '33070:33060'
+    expose:
+      - '3307'
+      - '33070'
