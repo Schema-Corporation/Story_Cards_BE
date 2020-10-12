@@ -9,10 +9,10 @@ module.exports = {
 
 function establishConnection() {
     const config = {
-        password: 'password',
-        user: 'user',
+        password: 'root',
+        user: 'root',
         host: 'localhost',
-        port: 33070,
+        port: 33060,
         schema: 'db_story_cards'
     };
     session = mysqlx.getSession(config).then(session => {

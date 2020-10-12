@@ -11,10 +11,11 @@ module.exports = {
                 .execute().then(result => {
                     let rawResult = result.fetchOne();
                     return {id: rawResult[0], username: rawResult[1], password: rawResult[2]}
-                }).catch(() => {
-                        return null
-                    }
-                )
+                }).catch((error) => {
+                    console.log('error: ', error);
+                    return null
+                }
+            )
         }).catch(() => {
             return null
         })
