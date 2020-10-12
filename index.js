@@ -16,11 +16,15 @@ app.post('/login', (req, res) => {
     const password = credentials.split(":")[1]
     authenticationService.signIn(user, password).then(value => {
         if (value != null) {
-            res.send(value);
+            res.send({"token": value});
         } else {
             res.sendStatus(401);
         }
     })
+})
+app.post('/validate-code/:code', securityUtil.authenticateToken, (req, res) => {
+    const params = req.params
+    const code = params.code;
 })
 app.listen(port, () => {
     console.log(`Example app listening at http://localhost:${port}`)

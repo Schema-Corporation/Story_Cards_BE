@@ -12,9 +12,11 @@ module.exports = {
                     let rawResult = result.fetchOne();
                     return {id: rawResult[0], bookCode: rawResult[1], status: rawResult[2], enabled: rawResult[3]}
                 }).catch(() => {
-                    return null;
+                    return null
                 }).then(databaseCode => {
                     return databaseCode;
+                }).catch(() => {
+                    return null
                 })
         })
     }

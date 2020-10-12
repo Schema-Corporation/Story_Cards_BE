@@ -5,8 +5,6 @@ module.exports = {
         let databaseCode = registrationRepository.getBookCodeByCode(bookCode).then(object => {
             return object;
         })
-        if (databaseCode != null) {
-            
-        }
+        return databaseCode != null;
     }
 }
