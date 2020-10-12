@@ -5,9 +5,10 @@ const authenticationRepository = require('./authenticationRepository.js')
 module.exports = {
     signIn: function (username, password) {
         return authenticationRepository.findUserByUsername(username).then(user => {
-            if (user.password === password) {
+            if (user != null && user.password === password) {
                 return generateAccessToken(username);
             } else {
+                console.log("Error authenticating user")
                 return null;
             }
         });

@@ -9,12 +9,21 @@ module.exports = {
                 .where('username = :username')
                 .bind('username', username)
                 .execute().then(result => {
-                    let rawResult = result.fetchOne();
+                    let rawResult = result.fetchOne().catch(() => {
+                        return null
+                    });
                     return {id: rawResult[0], username: rawResult[1], password: rawResult[2]}
-                })
+                }).catch(() => {
+                        return null
+                    }
+                )
+        }).catch(() => {
+            return null
         })
         return user.then(result => {
             return result;
+        }).catch(() => {
+            return null
         })
     }
 }
