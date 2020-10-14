@@ -1,14 +1,15 @@
 const databaseConfig = require('../config/database');
 
 module.exports = {
-    getBookCodeByCode: function (userCode) {
+    getBookCodeByCode: function (userCode, enabled) {
         let table = databaseConfig.getSession().then(sessionResult => {
             return sessionResult.getTable('book_code');
         });
         return table.then(table => {
             return table.select(['id', 'book_code', 'status', 'enabled'])
-                .where('book_code = :bookCode and enabled = true and status = 0')
+                .where('book_code = :bookCode and enabled = :enabled')
                 .bind('bookCode', userCode)
+                .bind('enabled', enabled)
                 .execute().then(result => {
                     let rawResult = result.fetchOne();
                     console.log(rawResult);
@@ -22,12 +23,14 @@ module.exports = {
                 })
         })
     },
-    getBookCodeById: function (bookCodeId) {
+    getBookCodeById: function (bookCodeId, status, enabled) {
         return databaseConfig.getSession().then(sessionResult => {
             let table = sessionResult.getTable('book_code');
             return table.select(['id', 'book_code', 'status', 'enabled'])
-                .where('id = :bookCodeId and enabled = true and status = 0')
+                .where('id = :bookCodeId and enabled = :enabled and status = :status')
                 .bind('bookCodeId', bookCodeId)
+                .bind('status', status)
+                .bind('enabled', enabled)
                 .execute().then(result => {
                     let rawResult = result.fetchOne();
                     if (rawResult != null)

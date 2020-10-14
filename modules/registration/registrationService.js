@@ -2,18 +2,18 @@ const bookCodeRepository = require('../repository/bookCodeRepository.js')
 const userRepository = require('../repository/userRepository.js')
 module.exports = {
     validateBookCode: function (bookCode) {
-        return bookCodeRepository.getBookCodeByCode(bookCode).then(object => {
+        return bookCodeRepository.getBookCodeByCode(bookCode, true).then(object => {
             console.log("Retrieved book successfully: " + object);
             return object;
-        }).catch(() => {
-            console.log("Could not validate book Code");
+        }).catch(error => {
+            console.log("Could not validate book Code: " + error);
             return null;
         })
     },
     registerUser: function (userData) {
         return userRepository.findUserByUsername(userData.username).then(userExists => {
             console.log("Retrieved user successfully: " + userExists);
-            return bookCodeRepository.getBookCodeById(userData.bookCodeId).then(bookCode => {
+            return bookCodeRepository.getBookCodeById(userData.bookCodeId, 0, true).then(bookCode => {
                 console.log("Retrieved Book Successfully: " + bookCode);
                 if (userExists === null && bookCode != null) {
                     return bookCodeRepository.updateBookCodeById(bookCode.id, 1).then(
