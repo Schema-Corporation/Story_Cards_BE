@@ -35,7 +35,7 @@ app.post('/validate-code/:code', (req, res) => {
     registrationService.validateBookCode(code).then(result => {
         const isValid = result.bookCode != null;
         if (isValid) {
-            res.sendStatus(200);
+            res.status(200).send(result);
         } else {
             res.status(422).send({"error": "Could not validate code since it does not exists or has been used!"});
         }
