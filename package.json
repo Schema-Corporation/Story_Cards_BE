@@ -15,7 +15,8 @@
     "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
     "mysql": "^2.18.1",
-    "mysqlx": "^1.1.7"
+    "mysqlx": "^1.1.7",
+    "uuid": "^8.3.1"
   },
   "devDependencies": {
     "@mysql/xdevapi": "^8.0.21"

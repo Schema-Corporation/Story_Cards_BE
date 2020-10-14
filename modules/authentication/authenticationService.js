@@ -1,6 +1,6 @@
 require('dotenv').config();
 const jwt = require("jsonwebtoken");
-const authenticationRepository = require('./authenticationRepository.js')
+const authenticationRepository = require('../repository/userRepository.js')
 
 module.exports = {
     signIn: function (username, password) {

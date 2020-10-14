@@ -2,7 +2,7 @@ version: '3.7'
 services:
   database:
     image: mysql
-    restart: always
+    restart: on-failure
     environment:
       MYSQL_DATABASE: 'db_story_cards'
       MYSQL_USER: 'user'

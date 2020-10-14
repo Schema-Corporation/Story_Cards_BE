@@ -1,30 +1,19 @@
 const express = require('express')
 const app = express()
 const cors = require('cors')
-
-var corsConfiguration = require('./modules/config/corsConfiguration');
-
-app.use(express.json())
-
-var whitelist = corsConfiguration.server.CLIENTS;
-var corsOptions = {
-    origin: function (origin, callback) {
-        if (whitelist.indexOf(origin) !== -1) {
-            callback(null, true)
-        } else {
-            callback(new Error('Not allowed by CORS'))
-        }
-    }
-}
-
-app.use(cors(corsOptions));
-
+require('./modules/config/corsConfiguration');
 const port = 3000
 const authenticationService = require('./modules/authentication/authenticationService.js');
+const registrationService = require('./modules/registration/registrationService.js');
 const securityUtil = require('./modules/utils/SecurityUtil.js')
+const bodyParser = require('body-parser')
+
+app.use(express.json())
+app.use(bodyParser.json())
+app.use(cors());
 app.get('/', securityUtil.authenticateToken, (req, res) => {
     console.log(req.claims)
-    res.send('Hello World!')
+    res.send('Service is alive!')
 })
 app.post('/login', (req, res) => {
     const authHeader = req.headers.authorization
@@ -36,14 +25,41 @@ app.post('/login', (req, res) => {
         if (value != null) {
             res.send({"token": value});
         } else {
-            res.sendStatus(401);
+            res.status(401).send("User and Password do not match!");
         }
     })
 })
-app.post('/validate-code/:code', securityUtil.authenticateToken, (req, res) => {
+app.post('/validate-code/:code', (req, res) => {
     const params = req.params
     const code = params.code;
+    registrationService.validateBookCode(code).then(result => {
+        const isValid = result.bookCode != null;
+        if (isValid) {
+            res.sendStatus(200);
+        } else {
+            res.status(422).send({"error": "Could not validate code since it does not exists or has been used!"});
+        }
+    }).catch(error => {
+        console.log(error);
+        res.status(422).send({"error": "Could not validate code since it does not exists or has been used!"});
+    });
+
+})
+app.post('/register', (req, res) => {
+    const body = req.body;
+    registrationService.registerUser(body).then(result => {
+            if (result != null) {
+                res.status(201).send(result);
+            } else {
+                res.status(422).send({"error": "Could not register user due to code or user duplication!"});
+            }
+        }
+    ).catch(error => {
+        console.log("Could not register user");
+        console.log(error);
+        res.status(422).send({"error": "Could not register user!"});
+    })
 })
 app.listen(port, () => {
-    console.log(`Example app listening at http://localhost:${port}`)
+    console.log(`Story Cards Server listening at http://localhost:${port}`)
 })
