@@ -6,7 +6,7 @@ module.exports = {
     signIn: function (username, password) {
         return authenticationRepository.findUserByUsername(username).then(user => {
             if (user != null && user.password === password) {
-                return generateAccessToken(username);
+                return {"token": generateAccessToken(username), "user": user};
             } else {
                 console.log("Error authenticating user")
                 return null;

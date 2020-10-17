@@ -4,13 +4,18 @@ module.exports = {
     findUserByUsername: function (username) {
         return databaseConfig.getSession().then(sessionResult => {
             let table = sessionResult.getTable('user');
-            return table.select(['id', 'username', 'password'])
+            return table.select(['id', 'username', 'password', 'full_name'])
                 .where('username = :username')
                 .bind('username', username)
                 .execute().then(result => {
                     let rawResult = result.fetchOne();
                     if (rawResult != null)
-                        return {id: rawResult[0], username: rawResult[1], password: rawResult[2]}
+                        return {
+                            id: rawResult[0],
+                            username: rawResult[1],
+                            password: rawResult[2],
+                            fullName: rawResult[3]
+                        }
                     return null;
                 }).catch((error) => {
                     console.log('error: ', error);

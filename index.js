@@ -23,7 +23,7 @@ app.post('/login', (req, res) => {
     const password = credentials.split(":")[1]
     authenticationService.signIn(user, password).then(value => {
         if (value != null) {
-            res.send({"token": value});
+            res.send({"token": value.token, "fullName": value.user.fullName});
         } else {
             res.status(401).send("User and Password do not match!");
         }
