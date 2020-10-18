@@ -1,14 +1,37 @@
+const LocalDate = require("@js-joda/core");
 const bookCodeRepository = require('../repository/bookCodeRepository.js')
 const userRepository = require('../repository/userRepository.js')
+const accessAttemptRepository = require('../repository/accessAttemptsRepository.js')
+const errorUtils = require('../utils/ErrorConstants')
+
 module.exports = {
-    validateBookCode: function (bookCode) {
-        return bookCodeRepository.getBookCodeByCode(bookCode, true).then(object => {
-            console.log("Retrieved book successfully: " + object);
-            return object;
+    validateBookCode: function (bookCode, ipAddress) {
+        return accessAttemptRepository.getAccessAttemptsByIdentifier(ipAddress).then(attemptObject => {
+            if (attemptObject === null) {
+                accessAttemptRepository.registerAccessAttemptByIdentifier(ipAddress, LocalDate.LocalDateTime.now().plusDays(1).toString());
+            } else if (attemptObject.attempts > 3) {
+                let now = LocalDate.LocalDateTime.now();
+                let penaltyEndDate = LocalDate.LocalDateTime.ofEpochSecond(attemptObject.endDate, LocalDate.ZoneOffset.UTC);
+                if (penaltyEndDate.isAfter(now)) {
+                    return {response: null, error: errorUtils.TOO_MANY_ATTEMPTS};
+                } else {
+                    accessAttemptRepository.updateAccessAttemptByIdentifier(ipAddress, 1, LocalDate.LocalDateTime.now().plusDays(1).toString());
+                }
+            } else {
+                accessAttemptRepository.updateAccessAttemptByIdentifier(ipAddress, attemptObject.attempts + 1, LocalDate.LocalDateTime.now().plusDays(1).toString());
+            }
+            return bookCodeRepository.getBookCodeByCode(bookCode, true).then(object => {
+                console.log("Retrieved book successfully: " + object);
+                return {response: object, error: null};
+            }).catch(error => {
+                console.log("Could not validate book Code: " + error);
+                return {response: null, error: errorUtils.BOOK_DOES_NOT_EXIST};
+            })
         }).catch(error => {
-            console.log("Could not validate book Code: " + error);
-            return null;
-        })
+            console.log("Could not get access attempts with following error:" + error);
+            return {response: null, error: errorUtils.DB_ERROR};
+        });
+
     },
     registerUser: function (userData) {
         return userRepository.findUserByUsername(userData.username).then(userExists => {

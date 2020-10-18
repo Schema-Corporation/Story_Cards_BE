@@ -7,6 +7,7 @@ const authenticationService = require('./modules/authentication/authenticationSe
 const registrationService = require('./modules/registration/registrationService.js');
 const securityUtil = require('./modules/utils/SecurityUtil.js')
 const bodyParser = require('body-parser')
+const errorUtils = require('./modules/utils/ErrorConstants')
 
 app.use(express.json())
 app.use(bodyParser.json())
@@ -32,16 +33,29 @@ app.post('/login', (req, res) => {
 app.post('/validate-code/:code', (req, res) => {
     const params = req.params
     const code = params.code;
-    registrationService.validateBookCode(code).then(result => {
-        const isValid = result.bookCode != null;
-        if (isValid) {
-            res.status(200).send(result);
+    const ipAddress = req.header("X-IP");
+
+    registrationService.validateBookCode(code, ipAddress).then(result => {
+        const responseObject = result;
+        if (responseObject.error === null) {
+            const isValid = responseObject.response.bookCode != null;
+            if (isValid) {
+                res.status(200).send(result);
+            } else {
+                res.status(422).send({"error": "Could not validate code since it does not exists or has been used!"});
+            }
         } else {
-            res.status(422).send({"error": "Could not validate code since it does not exists or has been used!"});
+            const errorCode = responseObject.error;
+            if (errorCode === errorUtils.TOO_MANY_ATTEMPTS) {
+                res.status(403).send({"error": "Too many attempts from this ip address have been made"});
+            } else {
+                res.status(500).send({"error": "Internal Server Error"});
+            }
         }
+
     }).catch(error => {
         console.log(error);
-        res.status(422).send({"error": "Could not validate code since it does not exists or has been used!"});
+        res.status(500).send({"error": "Internal Server Error"});
     });
 
 })

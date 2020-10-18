@@ -1,5 +1,4 @@
 const databaseConfig = require('../config/database');
-
 module.exports = {
     getBookCodeByCode: function (userCode, enabled) {
         let table = databaseConfig.getSession().then(sessionResult => {
