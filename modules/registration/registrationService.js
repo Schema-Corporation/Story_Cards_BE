@@ -22,6 +22,7 @@ module.exports = {
             }
             return bookCodeRepository.getBookCodeByCode(bookCode, true).then(object => {
                 console.log("Retrieved book successfully: " + object);
+                accessAttemptRepository.updateAccessAttemptByIdentifier(ipAddress, 0, LocalDate.LocalDateTime.now().plusDays(1).toString());
                 return {response: object, error: null};
             }).catch(error => {
                 console.log("Could not validate book Code: " + error);
