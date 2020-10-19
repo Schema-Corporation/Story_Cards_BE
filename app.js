@@ -2,7 +2,7 @@ const express = require('express')
 const app = express()
 const cors = require('cors')
 require('./modules/config/corsConfiguration');
-const port = 8080
+const port = normalizePort(process.env.PORT || '3000');
 const authenticationService = require('./modules/authentication/authenticationService.js');
 const registrationService = require('./modules/registration/registrationService.js');
 const securityUtil = require('./modules/utils/SecurityUtil.js')
@@ -77,3 +77,18 @@ app.post('/register', (req, res) => {
 app.listen(port, () => {
     console.log(`Story Cards Server listening at http://localhost:${port}`)
 })
+function normalizePort(val) {
+    var port = parseInt(val, 10);
+
+    if (isNaN(port)) {
+        // named pipe
+        return val;
+    }
+
+    if (port >= 0) {
+        // port number
+        return port;
+    }
+
+    return false;
+}
