@@ -2,7 +2,7 @@ const express = require('express')
 const app = express()
 const cors = require('cors')
 require('./modules/config/corsConfiguration');
-const port = 3000
+const port = 8080
 const authenticationService = require('./modules/authentication/authenticationService.js');
 const registrationService = require('./modules/registration/registrationService.js');
 const securityUtil = require('./modules/utils/SecurityUtil.js')
