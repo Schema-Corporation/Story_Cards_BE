@@ -4,9 +4,7 @@ const databasePassword = process.env.DATABASE_PASSWORD
 const databasePort = process.env.DATABASE_PORT
 const databaseHost = process.env.DATABASE_HOST
 const databaseSchema = process.env.DATABASE_SCHEMA
-if (process.env.NODE_ENV !== 'production') {
-    const dotenv = require('dotenv');
-}
+require('dotenv');
 
 let session
 module.exports = {
