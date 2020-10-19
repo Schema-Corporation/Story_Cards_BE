@@ -3,55 +3,42 @@ const uuid = require('uuid');
 const LocalDate = require("@js-joda/core").LocalDate;
 
 module.exports = {
-    getAccessAttemptsByIdentifier: function (identifier) {
-        return databaseConfig.getSession().then(sessionResult => {
-            let table = sessionResult.getTable('access_attempts');
-            return table.select(['id', 'identifier', 'attempts', 'end_date'])
-                .where('identifier = :identifier')
-                .bind('identifier', identifier)
-                .execute().then(result => {
-                    let rawResult = result.fetchOne();
-                    if (rawResult != null)
-                        return {
-                            id: rawResult[0],
-                            identifier: rawResult[1],
-                            attempts: rawResult[2],
-                            endDate: Date.parse(rawResult[3]) / 1000
-                        }
-                    return null;
-                }).catch(() => {
-                    return null
+    getAccessAttemptsByIdentifier: function (identifier, callback) {
+        databaseConfig.getSession().query('SELECT id,identifier,attempts,end_date FROM access_attempts where identifier = ?', identifier, (err, rows) => {
+            if (err) return callback(err);
+            let rawResult = rows[0];
+            if (rawResult === undefined) {
+                return callback(null);
+            } else {
+                return callback({
+                    id: rawResult.id,
+                    identifier: rawResult.identifier,
+                    attempts: rawResult.attempts,
+                    endDate: Date.parse(rawResult.end_date) / 1000
                 })
+            }
         })
     },
-    registerAccessAttemptByIdentifier: function (identifier, endDate) {
-        return databaseConfig.getSession().then(sessionResult => {
-            let table = sessionResult.getTable('access_attempts');
-            return table.insert(['id', 'identifier', 'attempts', 'end_date', 'enable', 'created_date'])
-                .values(uuid.v4(), identifier, 1, endDate, true, LocalDate.now().toString())
-                .execute().then(value => {
-                    return value;
-                }).catch(error => {
-                    console.log("Could not create access attempt registry because:" + error);
-                    return null;
-                })
-        });
+    registerAccessAttemptByIdentifier: function (identifier, endDate, callback) {
+        let accessAttempt = {
+            id: uuid.v4(),
+            identifier: identifier,
+            attempts: 1,
+            end_date: endDate,
+            enable: true,
+            created_date: LocalDate.now().toString()
+        }
+        databaseConfig.getSession().query('INSERT INTO access_attempts SET ?', accessAttempt, (err, res) => {
+            if (err) return callback(err);
+
+            return this.getAccessAttemptsByIdentifier(identifier, callback);
+        })
     },
-    updateAccessAttemptByIdentifier: function (identifier, attempts, endDate) {
-        return databaseConfig.getSession().then(sessionResult => {
-            let table = sessionResult.getTable('access_attempts');
-            return table.update()
-                .set('attempts', attempts)
-                .set('end_date', endDate)
-                .where("identifier = :identifier")
-                .bind("identifier", identifier)
-                .execute().then(() => {
-                    return this.getAccessAttemptsByIdentifier(identifier).then(result => {
-                        return result;
-                    })
-                }).catch(() => {
-                    return null;
-                })
-        });
+    updateAccessAttemptByIdentifier: function (identifier, attempts, endDate, callback) {
+        databaseConfig.getSession().query('UPDATE access_attempts SET attempts = ?,end_date = ? WHERE identifier = ?', [attempts, endDate, identifier], (err, result) => {
+            if (err) return callback(err);
+
+            return callback(result.changedRows[0])
+        })
     }
 }

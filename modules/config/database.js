@@ -1,4 +1,4 @@
-const mysqlx = require('@mysql/xdevapi');
+var mysql = require('mysql');
 const databaseUser = process.env.DATABASE_USER;
 const databasePassword = process.env.DATABASE_PASSWORD
 const databasePort = process.env.DATABASE_PORT
@@ -12,6 +12,10 @@ let session
 module.exports = {
     getSession: function () {
         establishConnection();
+        session.connect(function (err) {
+            if (err) console.log(err);
+            console.log("Connected!");
+        });
         return session;
     }
 }
@@ -21,16 +25,10 @@ function establishConnection() {
         password: databasePassword.toString(),
         user: databaseUser.toString(),
         host: databaseHost.toString(),
-        port: databasePort.toString(),
-        schema: databaseSchema.toString()
+        database: databaseSchema.toString(),
+        port: databasePort.toString()
     };
-    session = mysqlx.getSession(config).then(session => {
-        console.log("Established Connection Successfully");
-        return session.getSchema();
-    }).catch(reason => {
-        console.log(`Could not connect to host : ${databaseHost}:${databasePort} on schema: ${databaseSchema}`);
-        console.log(reason);
-    });
+    session = mysql.createConnection(config);
 }
 
 

@@ -1,51 +1,42 @@
 const databaseConfig = require('../config/database');
 const uuid = require('uuid');
+const LocalDate = require("@js-joda/core");
+
 module.exports = {
-    findUserByUsername: function (username) {
-        return databaseConfig.getSession().then(sessionResult => {
-            let table = sessionResult.getTable('user');
-            return table.select(['id', 'username', 'password', 'full_name'])
-                .where('username = :username')
-                .bind('username', username)
-                .execute().then(result => {
-                    let rawResult = result.fetchOne();
-                    if (rawResult != null)
-                        return {
-                            id: rawResult[0],
-                            username: rawResult[1],
-                            password: rawResult[2],
-                            fullName: rawResult[3]
-                        }
-                    return null;
-                }).catch((error) => {
-                    console.log('error: ', error);
-                    return null
-                })
-        }).catch(reason => {
-            console.log("Could not get table");
-            console.log(reason);
-        });
+    findUserByUsername: function (username, callback) {
+        return databaseConfig.getSession().query('SELECT id, username,email,phone, password, full_name,book_code_id FROM user WHERE username = ?', username, (err, rows) => {
+            if (err) return callback(err);
+            let rawResult = rows[0];
+            if (rawResult === undefined) {
+                return callback(null);
+            } else {
+                return callback({
+                    id: rawResult.id,
+                    username: rawResult.username,
+                    password: rawResult.password,
+                    fullName: rawResult.full_name,
+                    phone: rawResult.phone,
+                    email: rawResult.email,
+                    bookCodeId: rawResult.book_code_id
+                });
+            }
+        })
     },
-    registerUser: function (userData) {
-        return databaseConfig.getSession().then(sessionResult => {
-            let table = sessionResult.getTable('user');
-            let ts = Date.now();
+    registerUser: function (userData, callback) {
+        let insertObject = {
+            id: uuid.v4(),
+            username: userData.username,
+            password: userData.password,
+            email: userData.email,
+            phone: userData.phone,
+            full_name: userData.fullName,
+            created_date: LocalDate.LocalDate.now().toString(),
+            book_code_id: userData.bookCodeId
+        }
+        return databaseConfig.getSession().query('INSERT INTO user SET ?', insertObject, (err, result) => {
+            if (err) return callback(err);
 
-            let date_ob = new Date(ts);
-            let date = date_ob.getDate();
-            let month = date_ob.getMonth() + 1;
-            let year = date_ob.getFullYear();
-            let currentDate = year + "-" + month + "-" + date;
-            return table.insert(['id', 'username', 'password', 'email', 'phone', 'full_name', 'created_date', 'book_code_id'])
-                .values(uuid.v4(), userData.username, userData.password, userData.email, userData.phone, userData.fullName, currentDate, userData.bookCodeId)
-                .execute().then(value => {
-                    console.log(value)
-                    return value;
-                }).catch(reason => {
-                    console.log("Could not insert new user: " + reason);
-                    return null;
-                })
+            return this.findUserByUsername(userData.username, callback);
         });
-
     }
 }

@@ -5,7 +5,6 @@ require('./modules/config/corsConfiguration');
 const port = normalizePort(process.env.PORT || '3000');
 const authenticationService = require('./modules/authentication/authenticationService.js');
 const registrationService = require('./modules/registration/registrationService.js');
-const securityUtil = require('./modules/utils/SecurityUtil.js')
 const bodyParser = require('body-parser')
 const errorUtils = require('./modules/utils/ErrorConstants')
 
@@ -22,7 +21,7 @@ app.post('/login', (req, res) => {
     const credentials = Buffer.from(token, 'base64').toString()
     const user = credentials.split(":")[0]
     const password = credentials.split(":")[1]
-    authenticationService.signIn(user, password).then(value => {
+    authenticationService.signIn(user, password, function (value) {
         if (value != null) {
             res.send({"token": value.token, "fullName": value.user.fullName});
         } else {
@@ -34,8 +33,7 @@ app.post('/validate-code/:code', (req, res) => {
     const params = req.params
     const code = params.code;
     const ipAddress = req.header("X-IP");
-
-    registrationService.validateBookCode(code, ipAddress).then(result => {
+    registrationService.validateBookCode(code, ipAddress, function (result) {
         const responseObject = result;
         if (responseObject.error === null) {
             const isValid = responseObject.response.bookCode != null;
@@ -48,35 +46,29 @@ app.post('/validate-code/:code', (req, res) => {
             const errorCode = responseObject.error;
             if (errorCode === errorUtils.TOO_MANY_ATTEMPTS) {
                 res.status(403).send({"error": "Too many attempts from this ip address have been made"});
+            } else if (errorCode === errorUtils.BOOK_DOES_NOT_EXIST) {
+                res.status(422).send({"error": "Could not validate code since it does not exists or has been used!"});
             } else {
                 res.status(500).send({"error": "Internal Server Error"});
             }
         }
-
-    }).catch(error => {
-        console.log(error);
-        res.status(500).send({"error": "Internal Server Error"});
-    });
-
+    })
 })
 app.post('/register', (req, res) => {
     const body = req.body;
-    registrationService.registerUser(body).then(result => {
+    registrationService.registerUser(body, function (result) {
             if (result != null) {
                 res.status(201).send(result);
             } else {
                 res.status(422).send({"error": "Could not register user due to code or user duplication!"});
             }
         }
-    ).catch(error => {
-        console.log("Could not register user");
-        console.log(error);
-        res.status(422).send({"error": "Could not register user!"});
-    })
+    );
 })
 app.listen(port, () => {
     console.log(`Story Cards Server listening at http://localhost:${port}`)
 })
+
 function normalizePort(val) {
     var port = parseInt(val, 10);
 

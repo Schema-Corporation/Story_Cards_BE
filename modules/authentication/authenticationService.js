@@ -5,16 +5,16 @@ const jwt = require("jsonwebtoken");
 const authenticationRepository = require('../repository/userRepository.js')
 
 module.exports = {
-    signIn: function (username, password) {
-        return authenticationRepository.findUserByUsername(username).then(user => {
+    signIn: function (username, password, callback) {
+        return authenticationRepository.findUserByUsername(username, function (user) {
             if (user != null && user.password === password) {
-                return {
+                return callback({
                     "token": generateAccessToken({"username": user.username, "fullName": user.fullName}),
                     "user": user
-                };
+                });
             } else {
                 console.log("Error authenticating user")
-                return null;
+                return callback(null);
             }
         });
     }
