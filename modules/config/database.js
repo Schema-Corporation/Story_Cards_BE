@@ -28,7 +28,7 @@ function establishConnection() {
         console.log("Established Connection Successfully");
         return session.getSchema();
     }).catch(reason => {
-        console.log("Could not connect to database");
+        console.log(`Could not connect to host : ${databaseHost}:${databasePort} on schema: ${databaseSchema}`);
         console.log(reason);
     });
 }
