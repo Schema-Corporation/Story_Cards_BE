@@ -12,7 +12,7 @@ const errorUtils = require('./modules/utils/ErrorConstants')
 app.use(express.json())
 app.use(bodyParser.json())
 app.use(cors());
-app.get('/', securityUtil.authenticateToken, (req, res) => {
+app.get('/', (req, res) => {
     console.log(req.claims)
     res.send('Service is alive!')
 })

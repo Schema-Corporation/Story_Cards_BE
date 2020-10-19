@@ -2,14 +2,17 @@
   "name": "story_cards_be",
   "version": "1.0.0",
   "description": "Backend services for story cards app",
-  "main": "index.js",
+  "main": "app.js",
+  "nodejs": "",
   "scripts": {
-    "test": "test"
+    "test": "test",
+    "start": "node app.js"
   },
   "author": "Drassleon",
   "license": "ISC",
   "dependencies": {
     "@js-joda/core": "^3.2.0",
+    "@mysql/xdevapi": "^8.0.21",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
@@ -18,8 +21,5 @@
     "mysql": "^2.18.1",
     "mysqlx": "^1.1.7",
     "uuid": "^8.3.1"
-  },
-  "devDependencies": {
-    "@mysql/xdevapi": "^8.0.21"
   }
 }
