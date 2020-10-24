@@ -17,6 +17,14 @@ module.exports = {
             console.log("Connected!");
         });
         return session;
+    },
+    closeConnection: function () {
+        session.end(function (err) {
+            if (err) {
+                return console.log('error:' + err.message);
+            }
+            console.log('Close the database connection.');
+        });
     }
 }
 

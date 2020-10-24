@@ -14,7 +14,8 @@ module.exports = {
                     enabled: rawResult.enabled
                 });
             }
-        })
+        });
+        databaseConfig.closeConnection();
     },
     getBookCodeById: function (bookCodeId, status, enabled, callback) {
         databaseConfig.getSession().query('SELECT id,book_code,status,enabled FROM book_code WHERE id = ? and enabled = ? and status = ?', [bookCodeId, enabled, status], (err, result) => {
@@ -29,12 +30,14 @@ module.exports = {
                 status: rawResult.status,
                 enabled: rawResult.enabled
             })
-        })
+        });
+        databaseConfig.closeConnection();
     },
     updateBookCodeById: function (bookId, status, callback) {
         databaseConfig.getSession().query('UPDATE book_code SET status = ? WHERE id = ?', [status, bookId], (err, result) => {
             if (err) return callback(err);
             return this.getBookCodeById(bookId, status, true, callback);
-        })
+        });
+        databaseConfig.closeConnection();
     }
 }

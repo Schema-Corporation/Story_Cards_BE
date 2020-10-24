@@ -17,7 +17,8 @@ module.exports = {
                     endDate: Date.parse(rawResult.end_date) / 1000
                 })
             }
-        })
+        });
+        databaseConfig.closeConnection();
     },
     registerAccessAttemptByIdentifier: function (identifier, endDate, callback) {
         let accessAttempt = {
@@ -32,13 +33,15 @@ module.exports = {
             if (err) return callback(err);
 
             return this.getAccessAttemptsByIdentifier(identifier, callback);
-        })
+        });
+        databaseConfig.closeConnection();
     },
     updateAccessAttemptByIdentifier: function (identifier, attempts, endDate, callback) {
         databaseConfig.getSession().query('UPDATE access_attempts SET attempts = ?,end_date = ? WHERE identifier = ?', [attempts, endDate, identifier], (err, result) => {
             if (err) return callback(err);
 
             return callback(result.changedRows[0])
-        })
+        });
+        databaseConfig.closeConnection();
     }
 }

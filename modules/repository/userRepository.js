@@ -4,7 +4,7 @@ const LocalDate = require("@js-joda/core");
 
 module.exports = {
     findUserByUsername: function (username, callback) {
-        return databaseConfig.getSession().query('SELECT id, username,email,phone, password, full_name,book_code_id FROM user WHERE username = ?', username, (err, rows) => {
+        databaseConfig.getSession().query('SELECT id, username,email,phone, password, full_name,book_code_id FROM user WHERE username = ?', username, (err, rows) => {
             if (err) return callback(err);
             let rawResult = rows[0];
             if (rawResult === undefined) {
@@ -20,7 +20,8 @@ module.exports = {
                     bookCodeId: rawResult.book_code_id
                 });
             }
-        })
+        });
+        databaseConfig.closeConnection();
     },
     registerUser: function (userData, callback) {
         let insertObject = {
@@ -33,10 +34,11 @@ module.exports = {
             created_date: LocalDate.LocalDate.now().toString(),
             book_code_id: userData.bookCodeId
         }
-        return databaseConfig.getSession().query('INSERT INTO user SET ?', insertObject, (err, result) => {
+        databaseConfig.getSession().query('INSERT INTO user SET ?', insertObject, (err, result) => {
             if (err) return callback(err);
 
             return this.findUserByUsername(userData.username, callback);
         });
+        databaseConfig.closeConnection();
     }
 }
