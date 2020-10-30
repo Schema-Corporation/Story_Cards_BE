@@ -83,7 +83,7 @@ app.put('/canvas/:canvasId', securityUtils.authenticateToken, (req, res) => {
     if (Object.keys(req.body).length === 0) {
         res.status(422).send({"error": "Body cannot be null!"});
     } else {
-        canvasService.updateCanvas(userId, canvasId, req.body.data, function (result) {
+        canvasService.updateCanvas(userId, canvasId, req.body.data, req.body.name, function (result) {
             if (result === null) {
                 res.status(500).send("Internal Server Error");
             } else {
