@@ -9,7 +9,11 @@ module.exports = {
         return authenticationRepository.findUserByUsername(username, function (user) {
             if (user != null && user.password === password) {
                 return callback({
-                    "token": generateAccessToken({"username": user.username, "fullName": user.fullName}),
+                    "token": generateAccessToken({
+                        "username": user.username,
+                        "fullName": user.fullName,
+                        "userId": user.id
+                    }),
                     "user": user
                 });
             } else {
@@ -21,5 +25,5 @@ module.exports = {
 }
 
 function generateAccessToken(user) {
-    return jwt.sign({user}, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '1800s'});
+    return jwt.sign({user}, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '3600s'});
 }

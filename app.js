@@ -5,8 +5,10 @@ require('./modules/config/corsConfiguration');
 const port = normalizePort(process.env.PORT || '3000');
 const authenticationService = require('./modules/authentication/authenticationService.js');
 const registrationService = require('./modules/registration/registrationService.js');
-const bodyParser = require('body-parser')
-const errorUtils = require('./modules/utils/ErrorConstants')
+const securityUtils = require('./modules/utils/SecurityUtil');
+const bodyParser = require('body-parser');
+const errorUtils = require('./modules/utils/ErrorConstants');
+const canvasService = require('./modules/canvas/canvasService');
 
 app.use(express.json())
 app.use(bodyParser.json())
@@ -29,6 +31,17 @@ app.post('/login', (req, res) => {
         }
     })
 })
+app.get('/canvas', securityUtils.authenticateToken, (req, res) => {
+    const userId = req.claims.user.userId;
+    canvasService.getCanvas(userId, function (result) {
+        const responseObject = result;
+        if (responseObject.error === null) {
+            res.status(200).send(responseObject.response);
+        } else {
+            res.status(422).send(responseObject.error);
+        }
+    });
+});
 app.post('/validate-code/:code', (req, res) => {
     const params = req.params
     const code = params.code;

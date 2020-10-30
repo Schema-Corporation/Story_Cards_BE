@@ -45,7 +45,7 @@ module.exports = {
             bookCodeRepository.getBookCodeById(userData.bookCodeId, 0, true, function (bookCode) {
                 console.log("Retrieved Book Successfully: " + bookCode);
                 if (userExists === null && bookCode != null) {
-                    bookCodeRepository.updateBookCodeById(bookCode.id, 1, function (result) {
+                    bookCodeRepository.updateBookCodeById(bookCode.id, 0, function (result) {
                         console.log("Updated Book Code Successfully: ", result);
                         userRepository.registerUser(userData, function (insertResult) {
                             if (insertResult === null) {
