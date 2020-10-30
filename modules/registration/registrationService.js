@@ -1,8 +1,9 @@
 const LocalDate = require("@js-joda/core");
-const bookCodeRepository = require('../repository/bookCodeRepository.js')
-const userRepository = require('../repository/userRepository.js')
-const accessAttemptRepository = require('../repository/accessAttemptsRepository.js')
-const errorUtils = require('../utils/ErrorConstants')
+const bookCodeRepository = require('../repository/bookCodeRepository.js');
+const userRepository = require('../repository/userRepository.js');
+const accessAttemptRepository = require('../repository/accessAttemptsRepository.js');
+const errorUtils = require('../utils/ErrorConstants');
+const securityUtils = require('../utils/SecurityUtil');
 
 module.exports = {
     validateBookCode: function (bookCode, ipAddress, response) {
@@ -47,14 +48,17 @@ module.exports = {
                 if (userExists === null && bookCode != null) {
                     bookCodeRepository.updateBookCodeById(bookCode.id, 0, function (result) {
                         console.log("Updated Book Code Successfully: ", result);
-                        userRepository.registerUser(userData, function (insertResult) {
-                            if (insertResult === null) {
-                                bookCodeRepository.updateBookCodeById(bookCode.id, 0, function () {
-                                    return null;
-                                })
-                            }
-                            return callback(insertResult);
-                        })
+                        securityUtils.hashPassword(userData.password, function (hashedPassword) {
+                            userData.password = hashedPassword;
+                            userRepository.registerUser(userData, function (insertResult) {
+                                if (insertResult === null) {
+                                    bookCodeRepository.updateBookCodeById(bookCode.id, 0, function () {
+                                        return null;
+                                    })
+                                }
+                                return callback(insertResult);
+                            })
+                        });
                     });
                 } else {
                     return callback(null);

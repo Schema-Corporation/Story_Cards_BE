@@ -37,8 +37,8 @@ app.get('/canvas', securityUtils.authenticateToken, (req, res) => {
         const responseObject = result;
         if (responseObject.error === null) {
             res.status(200).send(responseObject.response);
-        } else {
-            res.status(422).send(responseObject.error);
+        } else if (responseObject.error === errorUtils.NO_CANVAS_FOUND) {
+            res.status(200).send([]);
         }
     });
 });

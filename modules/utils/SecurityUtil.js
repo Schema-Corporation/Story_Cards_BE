@@ -1,6 +1,8 @@
 const tokenSecret = process.env.ACCESS_TOKEN_SECRET
 require('dotenv').config();
 const jwt = require("jsonwebtoken");
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
 
 module.exports = {
     authenticateToken: function (req, res, next) {
@@ -18,5 +20,23 @@ module.exports = {
             req.claims = claims
             next()
         })
+    },
+    hashPassword: function (password, callback) {
+        bcrypt.hash(password, saltRounds, (err, hash) => {
+            if (err) {
+                console.log("Could not hash password, following error happened: " + err);
+                throw err;
+            }
+            return callback(hash);
+        });
+    },
+    compareStrings: function (rawString, hashedString, callback) {
+        bcrypt.compare(rawString, hashedString, function (err, res) {
+            if (err) {
+                console.log("Could not compare strings, following error happened: " + err);
+                throw err;
+            }
+            return callback(res);
+        });
     }
 }
