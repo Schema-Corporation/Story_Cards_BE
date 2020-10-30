@@ -73,6 +73,25 @@ app.get('/canvas/:canvasId', securityUtils.authenticateToken, (req, res) => {
         }
     });
 });
+app.put('/canvas/:canvasId', securityUtils.authenticateToken, (req, res) => {
+    const userId = req.claims.user.userId;
+    const params = req.params
+    const canvasId = params.canvasId;
+    if (canvasId === null || canvasId === undefined) {
+        res.status(422).send({"error": "Canvas Id is required!"})
+    }
+    if (Object.keys(req.body).length === 0) {
+        res.status(422).send({"error": "Body cannot be null!"});
+    } else {
+        canvasService.updateCanvas(userId, canvasId, req.body.data, function (result) {
+            if (result === null) {
+                res.status(500).send("Internal Server Error");
+            } else {
+                res.status(200).send(result);
+            }
+        });
+    }
+});
 app.delete('/canvas/:canvasId', securityUtils.authenticateToken, (req, res) => {
     const userId = req.claims.user.userId;
     const params = req.params

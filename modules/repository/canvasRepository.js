@@ -59,6 +59,16 @@ module.exports = {
         });
         databaseConfig.closeConnection();
     },
+    updateCanvasForUser: function (canvasId, data, callback) {
+        databaseConfig.getSession().query('UPDATE canvas SET data = ?,updated_date = ?', [data, LocalDate.LocalDate.now().toString()], (err, result) => {
+            if (err) {
+                console.log(err);
+                return callback(null);
+            }
+            return this.getCanvasByCanvasId(canvasId, callback);
+        });
+        databaseConfig.closeConnection();
+    },
     deleteCanvasForUser: function (canvasId, callback) {
         databaseConfig.getSession().query('DELETE FROM canvas where id = ?', canvasId, (err, result) => {
             if (err) {
@@ -67,5 +77,6 @@ module.exports = {
             }
             return callback(result);
         });
+        databaseConfig.closeConnection();
     }
 }

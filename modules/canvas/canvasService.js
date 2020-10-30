@@ -29,6 +29,17 @@ module.exports = {
     createCanvas: function (userId, canvasObject, response) {
         canvasRepository.createCanvasForUser(canvasObject, userId, response);
     },
+    updateCanvas: function (userId, canvasId, data, response) {
+        canvasRepository.getCanvasByCanvasId(canvasId, function (result) {
+            if (result === undefined) {
+                return response({"error": errorUtils.NO_CANVAS_FOUND})
+            } else if (result.userId !== userId) {
+                return response({"error": errorUtils.CANVAS_DOES_NOT_BELONG})
+            } else {
+                canvasRepository.updateCanvasForUser(canvasId, data, response);
+            }
+        });
+    },
     deleteCanvas: function (userId, canvasId, response) {
         canvasRepository.getCanvasByCanvasId(canvasId, function (result) {
             if (result === undefined) {
