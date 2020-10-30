@@ -29,7 +29,7 @@ module.exports = {
             }
             bookCodeRepository.getBookCodeByCode(bookCode, true, function (bookCodeResult) {
                 console.log("Retrieved book successfully: " + bookCodeResult);
-                if (bookCodeResult === null) {
+                if (bookCodeResult === undefined) {
                     console.log("Could not validate book code");
                     return response({response: null, error: errorUtils.BOOK_DOES_NOT_EXIST});
                 }

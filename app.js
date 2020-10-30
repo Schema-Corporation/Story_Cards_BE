@@ -56,6 +56,23 @@ app.post('/canvas', securityUtils.authenticateToken, (req, res) => {
         });
     }
 });
+app.delete('/canvas/:canvasId', securityUtils.authenticateToken, (req, res) => {
+    const userId = req.claims.user.userId;
+    const params = req.params
+    const canvasId = params.canvasId;
+    if (canvasId === null || canvasId === undefined) {
+        res.status(422).send({"error": "Canvas Id is required!"})
+    }
+    canvasService.deleteCanvas(userId, canvasId, function (result) {
+        if (result === null) {
+            res.status(500).send("Internal Server Error");
+        } else if (result.error != null) {
+            res.status(422).send(result);
+        } else {
+            res.send(204);
+        }
+    });
+});
 app.post('/validate-code/:code', (req, res) => {
     const params = req.params
     const code = params.code;

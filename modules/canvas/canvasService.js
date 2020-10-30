@@ -1,6 +1,5 @@
 const canvasRepository = require('../repository/canvasRepository.js')
 const errorUtils = require('../utils/ErrorConstants')
-
 module.exports = {
     getCanvas: function (userId, response) {
         canvasRepository.getCanvasByUserId(userId, function (searchResult) {
@@ -18,5 +17,17 @@ module.exports = {
     },
     createCanvas: function (userId, canvasObject, response) {
         canvasRepository.createCanvasForUser(canvasObject, userId, response);
+    },
+    deleteCanvas: function (userId, canvasId, response) {
+        canvasRepository.getCanvasByCanvasId(canvasId, function (result) {
+            if (result === undefined) {
+                return response({"error": errorUtils.NO_CANVAS_FOUND})
+            } else if (result.userId !== userId) {
+                return response({"error": errorUtils.CANVAS_DOES_NOT_BELONG})
+            } else {
+                canvasRepository.deleteCanvasForUser(canvasId, response);
+            }
+        });
     }
 }
+

@@ -20,6 +20,26 @@ module.exports = {
         });
         databaseConfig.closeConnection();
     },
+    getCanvasByCanvasId: function (canvasId, callback) {
+        databaseConfig.getSession().query('SELECT id,user_id,name,data,type FROM canvas c where c.id = ?', canvasId, (err, result) => {
+            if (err) {
+                console.log(err);
+                return callback(null);
+            }
+            let rawResult = result[0];
+            if (rawResult === undefined) {
+                return callback(rawResult);
+            }
+            return callback({
+                id: rawResult.id,
+                userId: rawResult.user_id,
+                name: rawResult.name,
+                data: rawResult.data,
+                type: rawResult.type
+            })
+        });
+        databaseConfig.closeConnection();
+    },
     createCanvasForUser: function (canvasData, userId, callback) {
         let objectToInsert = {
             "id": uuid.v4(),
@@ -38,5 +58,14 @@ module.exports = {
             return this.getCanvasByUserId(userId, callback);
         });
         databaseConfig.closeConnection();
+    },
+    deleteCanvasForUser: function (canvasId, callback) {
+        databaseConfig.getSession().query('DELETE FROM canvas where id = ?', canvasId, (err, result) => {
+            if (err) {
+                console.log(err);
+                return callback(null);
+            }
+            return callback(result);
+        });
     }
 }
