@@ -42,6 +42,20 @@ app.get('/canvas', securityUtils.authenticateToken, (req, res) => {
         }
     });
 });
+app.post('/canvas', securityUtils.authenticateToken, (req, res) => {
+    const userId = req.claims.user.userId;
+    if (Object.keys(req.body).length === 0) {
+        res.status(422).send({"error": "Body cannot be null!"});
+    } else {
+        canvasService.createCanvas(userId, req.body, function (result) {
+            if (result === null) {
+                res.status(500).send("Internal Server Error");
+            } else {
+                res.status(201).send(result);
+            }
+        });
+    }
+});
 app.post('/validate-code/:code', (req, res) => {
     const params = req.params
     const code = params.code;

@@ -1,8 +1,14 @@
 const databaseConfig = require('../config/database');
+const uuid = require('uuid');
+const LocalDate = require("@js-joda/core");
+
 module.exports = {
     getCanvasByUserId: function (userId, callback) {
         databaseConfig.getSession().query('SELECT id,user_id,name,data,type FROM canvas c where c.user_id = ?', userId, (err, result) => {
-            if (err) return callback(err);
+            if (err) {
+                console.log(err);
+                return callback(null);
+            }
             let parsedResult = [];
             result.forEach(rawResult => parsedResult.push({
                 id: rawResult.id,
@@ -10,11 +16,27 @@ module.exports = {
                 name: rawResult.name,
                 type: rawResult.type
             }))
-            if (parsedResult.length === 0) {
-                return callback(null);
-            } else {
-                return callback(parsedResult);
-            }
+            return callback(parsedResult);
         });
+        databaseConfig.closeConnection();
+    },
+    createCanvasForUser: function (canvasData, userId, callback) {
+        let objectToInsert = {
+            "id": uuid.v4(),
+            "user_id": userId,
+            "data": canvasData.data,
+            "name": canvasData.name,
+            "type": canvasData.type,
+            "created_date": LocalDate.LocalDate.now().toString(),
+            "updated_date": LocalDate.LocalDate.now().toString()
+        }
+        databaseConfig.getSession().query('INSERT INTO canvas SET ?', objectToInsert, (err, result) => {
+            if (err) {
+                console.log(err);
+                return callback(null);
+            }
+            return this.getCanvasByUserId(userId, callback);
+        });
+        databaseConfig.closeConnection();
     }
 }

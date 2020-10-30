@@ -4,7 +4,7 @@ const errorUtils = require('../utils/ErrorConstants')
 module.exports = {
     getCanvas: function (userId, response) {
         canvasRepository.getCanvasByUserId(userId, function (searchResult) {
-                if (searchResult === null) {
+                if (searchResult.length === 0) {
                     console.log("Could not find any canvas by userId");
                     return response({
                         "response": null,
@@ -15,5 +15,8 @@ module.exports = {
                 }
             }
         );
+    },
+    createCanvas: function (userId, canvasObject, response) {
+        canvasRepository.createCanvasForUser(canvasObject, userId, response);
     }
 }
