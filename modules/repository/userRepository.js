@@ -36,7 +36,7 @@ module.exports = {
             phone: userData.phone,
             first_name: userData.firstName,
             last_name: userData.lastName,
-            full_name: userData.fullName,
+            full_name: userData.firstName + " " + userData.lastName,
             country_code: userData.countryCode,
             country_name: userData.countryName,
             created_date: LocalDate.LocalDate.now().toString(),
