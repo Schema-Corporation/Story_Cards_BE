@@ -1,150 +1,46 @@
 const express = require('express')
 const app = express()
 const cors = require('cors')
+const createError = require('http-errors');
 require('./modules/config/corsConfiguration');
 const port = normalizePort(process.env.PORT || '3000');
-const authenticationService = require('./modules/authentication/authenticationService.js');
-const registrationService = require('./modules/registration/registrationService.js');
-const securityUtils = require('./modules/utils/SecurityUtil');
 const bodyParser = require('body-parser');
-const errorUtils = require('./modules/utils/ErrorConstants');
-const canvasService = require('./modules/canvas/canvasService');
+const path = require('path');
+const logger = require('morgan');
 
+const authenticationController = require('./routes/AuthenticationController');
+const canvasController = require('./routes/CanvasController');
+const registrationController = require('./routes/RegistrationController');
+
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'pug');
+
+app.use(logger('dev'));
 app.use(express.json())
 app.use(bodyParser.json())
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(cors());
+
+app.use('', authenticationController);
+app.use('/canvas', canvasController);
+app.use('', registrationController);
+
+
 app.get('/', (req, res) => {
-    console.log(req.claims)
-    res.send('Service is alive!')
+    res.render('HealthCheck', {title: "Health Check for Story Cards Services", message: "Services are healthy!"});
 })
-app.post('/login', (req, res) => {
-    const authHeader = req.headers.authorization
-    const token = authHeader && authHeader.split(' ')[1]
-    const credentials = Buffer.from(token, 'base64').toString()
-    const user = credentials.split(":")[0]
-    const password = credentials.split(":")[1]
-    authenticationService.signIn(user, password, function (value) {
-        if (value != null) {
-            res.send({"token": value.token, "fullName": value.user.fullName});
-        } else {
-            res.status(401).send("User and Password do not match!");
-        }
-    })
-})
-app.get('/canvas', securityUtils.authenticateToken, (req, res) => {
-    const userId = req.claims.user.userId;
-    canvasService.getCanvas(userId, function (result) {
-        const responseObject = result;
-        if (responseObject.error === null) {
-            res.status(200).send(responseObject.response);
-        } else if (responseObject.error === errorUtils.NO_CANVAS_FOUND) {
-            res.status(200).send([]);
-        }
-    });
+
+app.use(function (req, res, next) {
+    next(createError(404, "Page not found!", {expose: false}));
 });
-app.post('/canvas', securityUtils.authenticateToken, (req, res) => {
-    const userId = req.claims.user.userId;
-    if (Object.keys(req.body).length === 0) {
-        res.status(422).send({"error": "Body cannot be null!"});
-    } else {
-        canvasService.createCanvas(userId, req.body, function (result) {
-            if (result === null) {
-                res.status(500).send("Internal Server Error");
-            } else {
-                res.status(201).send(result);
-            }
-        });
-    }
+app.use(function (err, req, res, next) {
+    res.locals.message = err.message;
+    res.locals.error = process.env.environment === 'development' ? err : {};
+
+    res.status(err.status || 500);
+    res.render('error');
 });
-app.get('/canvas/:canvasId', securityUtils.authenticateToken, (req, res) => {
-    const userId = req.claims.user.userId;
-    const params = req.params
-    const canvasId = params.canvasId;
-    if (canvasId === null || canvasId === undefined) {
-        res.status(422).send({"error": "Canvas Id is required!"})
-    }
-    canvasService.getCanvasById(userId, canvasId, function (result) {
-        if (result === null) {
-            res.status(500).send("Internal Server Error");
-        } else if (result.error != null) {
-            res.status(422).send(result);
-        } else {
-            res.status(200).send(result);
-        }
-    });
-});
-app.put('/canvas/:canvasId', securityUtils.authenticateToken, (req, res) => {
-    const userId = req.claims.user.userId;
-    const params = req.params
-    const canvasId = params.canvasId;
-    if (canvasId === null || canvasId === undefined) {
-        res.status(422).send({"error": "Canvas Id is required!"})
-    }
-    if (Object.keys(req.body).length === 0) {
-        res.status(422).send({"error": "Body cannot be null!"});
-    } else {
-        canvasService.updateCanvas(userId, canvasId, req.body.data, req.body.name, function (result) {
-            if (result === null) {
-                res.status(500).send("Internal Server Error");
-            } else {
-                res.status(200).send(result);
-            }
-        });
-    }
-});
-app.delete('/canvas/:canvasId', securityUtils.authenticateToken, (req, res) => {
-    const userId = req.claims.user.userId;
-    const params = req.params
-    const canvasId = params.canvasId;
-    if (canvasId === null || canvasId === undefined) {
-        res.status(422).send({"error": "Canvas Id is required!"})
-    }
-    canvasService.deleteCanvas(userId, canvasId, function (result) {
-        if (result === null) {
-            res.status(500).send("Internal Server Error");
-        } else if (result.error != null) {
-            res.status(422).send(result);
-        } else {
-            res.status(204).send();
-        }
-    });
-});
-app.post('/validate-code/:code', (req, res) => {
-    const params = req.params
-    const code = params.code;
-    const ipAddress = req.header("X-IP");
-    registrationService.validateBookCode(code, ipAddress, function (result) {
-        const responseObject = result;
-        if (responseObject.error === null) {
-            const isValid = responseObject.response.bookCode != null;
-            if (isValid) {
-                res.status(200).send(result);
-            } else {
-                res.status(422).send({"error": "Could not validate code since it does not exists or has been used!"});
-            }
-        } else {
-            const errorCode = responseObject.error;
-            if (errorCode === errorUtils.TOO_MANY_ATTEMPTS) {
-                res.status(403).send({"error": "Too many attempts from this ip address have been made"});
-            } else if (errorCode === errorUtils.BOOK_DOES_NOT_EXIST) {
-                res.status(422).send({"error": "Could not validate code since it does not exists or has been used!"});
-            } else {
-                res.status(500).send({"error": "Internal Server Error"});
-            }
-        }
-    })
-})
-app.post('/register', (req, res) => {
-    const body = req.body;
-    registrationService.registerUser(body, function (result) {
-            if (result != null) {
-                res.status(201).send(result);
-            } else {
-                res.status(422).send({"error": "Could not register user due to code or user duplication!"});
-            }
-        }
-    );
-})
+
 app.listen(port, () => {
     console.log(`Story Cards Server listening at http://localhost:${port}`)
 })

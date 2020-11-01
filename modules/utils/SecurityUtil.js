@@ -1,4 +1,3 @@
-const tokenSecret = process.env.ACCESS_TOKEN_SECRET
 require('dotenv').config();
 const jwt = require("jsonwebtoken");
 const bcrypt = require('bcrypt');
@@ -12,7 +11,7 @@ module.exports = {
             console.log("Token is null")
             res.sendStatus(401)
         }
-        jwt.verify(token, tokenSecret.toString(), (err, claims) => {
+        jwt.verify(token, process.env.ACCESS_TOKEN_SECRET.toString(), (err, claims) => {
             if (err) {
                 console.log(err);
                 res.sendStatus(403)

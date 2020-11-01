@@ -1,9 +1,4 @@
 var mysql = require('mysql');
-const databaseUser = process.env.DATABASE_USER;
-const databasePassword = process.env.DATABASE_PASSWORD
-const databasePort = process.env.DATABASE_PORT
-const databaseHost = process.env.DATABASE_HOST
-const databaseSchema = process.env.DATABASE_SCHEMA
 if (process.env.NODE_ENV !== 'production') {
     require('dotenv');
 }
@@ -30,11 +25,11 @@ module.exports = {
 
 function establishConnection() {
     const config = {
-        password: databasePassword.toString(),
-        user: databaseUser.toString(),
-        host: databaseHost.toString(),
-        database: databaseSchema.toString(),
-        port: databasePort.toString()
+        password: process.env.DATABASE_PASSWORD.toString(),
+        user: process.env.DATABASE_USER.toString(),
+        host: process.env.DATABASE_HOST.toString(),
+        database: process.env.DATABASE_SCHEMA.toString(),
+        port: process.env.DATABASE_PORT.toString()
     };
     session = mysql.createConnection(config);
 }
