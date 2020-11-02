@@ -4,6 +4,7 @@ const authenticationService = require('../modules/authentication/authenticationS
 
 router.post('/login', (req, res) => {
     const authHeader = req.headers.authorization
+    console.log(authHeader);
     const token = authHeader && authHeader.split(' ')[1]
     const credentials = Buffer.from(token, 'base64').toString()
     const user = credentials.split(":")[0]
