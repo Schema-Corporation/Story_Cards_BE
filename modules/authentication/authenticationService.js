@@ -7,7 +7,7 @@ const securityUtil = require('../utils/SecurityUtil')
 module.exports = {
     signIn: function (username, password, callback) {
         return authenticationRepository.findUserByUsername(username, function (user) {
-            if (user != null) {
+            if (user != null && password != null && user.password != null) {
                 securityUtil.compareStrings(password, user.password, function (validationResult) {
                     if (validationResult) {
                         return callback({
