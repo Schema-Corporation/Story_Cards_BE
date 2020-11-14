@@ -60,7 +60,7 @@ module.exports = {
         databaseConfig.closeConnection();
     },
     updateCanvasForUser: function (canvasId, data, name, callback) {
-        databaseConfig.getSession().query('UPDATE canvas SET data = ?,name = ?,updated_date = ?', [data, name, LocalDate.LocalDate.now().toString()], (err, result) => {
+        databaseConfig.getSession().query('UPDATE canvas SET data = ?,name = ?,updated_date = ? where id = ?', [data, name, LocalDate.LocalDate.now().toString(), canvasId], (err, result) => {
             if (err) {
                 console.log(err);
                 return callback(null);
