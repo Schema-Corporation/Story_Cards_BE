@@ -1,7 +1,7 @@
 const LocalDate = require("@js-joda/core");
-const bookCodeRepository = require('../repository/bookCodeRepository.js');
-const userRepository = require('../repository/userRepository.js');
-const accessAttemptRepository = require('../repository/accessAttemptsRepository.js');
+const bookCodeRepository = require('../repository/BookCodeRepository.js');
+const userRepository = require('../repository/UserRepository.js');
+const accessAttemptRepository = require('../repository/AccessAttemptsRepository.js');
 const errorUtils = require('../utils/ErrorConstants');
 const securityUtils = require('../utils/SecurityUtil');
 

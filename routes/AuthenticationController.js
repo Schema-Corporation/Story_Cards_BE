@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const authenticationService = require('../modules/authentication/authenticationService');
+const authenticationService = require('../modules/authentication/AuthenticationService');
 
 router.post('/login', (req, res) => {
     const authHeader = req.headers.authorization

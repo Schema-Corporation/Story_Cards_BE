@@ -1,4 +1,4 @@
-const roomRepository = require('../repository/roomRepository.js')
+const roomRepository = require('../repository/RoomRepository.js')
 const errorUtils = require('../utils/ErrorConstants')
 module.exports = {
     getRooms: function (userId, response) {

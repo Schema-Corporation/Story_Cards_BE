@@ -2,7 +2,7 @@ if (process.env.NODE_ENV !== 'production') {
     require('dotenv').config();
 }
 const jwt = require("jsonwebtoken");
-const authenticationRepository = require('../repository/userRepository.js')
+const authenticationRepository = require('../repository/UserRepository.js')
 const securityUtil = require('../utils/SecurityUtil')
 module.exports = {
     signIn: function (username, password, callback) {

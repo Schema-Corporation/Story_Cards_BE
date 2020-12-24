@@ -1,4 +1,4 @@
-const databaseConfig = require('../config/database');
+const databaseConfig = require('../config/DatabaseConfig');
 module.exports = {
     getBookCodeByCode: function (userCode, enabled, callback) {
         databaseConfig.getSession().query('SELECT id,book_code,status,enabled FROM book_code bc WHERE bc.book_code = ? and enabled = ?', [userCode, enabled], (err, result) => {

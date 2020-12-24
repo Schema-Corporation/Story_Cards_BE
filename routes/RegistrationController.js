@@ -1,5 +1,5 @@
 const express = require('express');
-const registrationService = require("../modules/registration/registrationService");
+const registrationService = require("../modules/registration/RegistrationService");
 const errorUtils = require("../modules/utils/ErrorConstants");
 const router = express.Router();
 

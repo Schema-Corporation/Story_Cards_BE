@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const securityUtils = require('../modules/utils/SecurityUtil');
-const canvasService = require('../modules/canvas/canvasService');
+const canvasService = require('../modules/canvas/CanvasService');
 const errorUtils = require('../modules/utils/ErrorConstants');
 
 router.get('/', securityUtils.authenticateToken, (req, res) => {

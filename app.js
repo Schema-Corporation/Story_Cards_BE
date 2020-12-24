@@ -2,7 +2,7 @@ const express = require('express')
 const app = express()
 const cors = require('cors')
 const createError = require('http-errors');
-require('./modules/config/corsConfiguration');
+require('./modules/config/CorsConfiguration');
 const port = normalizePort(process.env.PORT || '3000');
 const bodyParser = require('body-parser');
 const path = require('path');
@@ -26,7 +26,6 @@ app.use('', authenticationController);
 app.use('/canvas', canvasController);
 app.use('/room', roomController);
 app.use('', registrationController);
-
 
 app.get('/', (req, res) => {
     res.render('HealthCheck', {title: "Health Check for Story Cards Services", message: "Services are healthy!"});
