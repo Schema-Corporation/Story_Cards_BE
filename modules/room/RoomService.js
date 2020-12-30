@@ -1,5 +1,6 @@
-const roomRepository = require('../repository/RoomRepository.js')
-const errorUtils = require('../utils/ErrorConstants')
+const roomRepository = require('../repository/RoomRepository.js');
+const errorUtils = require('../utils/ErrorConstants');
+const securityUtils = require('../utils/SecurityUtil');
 module.exports = {
     getRooms: function (userId, response) {
         roomRepository.getRoomsByUserId(userId, function (searchResult) {
@@ -15,7 +16,7 @@ module.exports = {
             }
         );
     },
-    getRoomById: function(userId, roomId, response) {
+    getRoomById: function (userId, roomId, response) {
         roomRepository.getRoomByRoomId(roomId, function (result) {
                 if (result === undefined) {
                     return response({"error": errorUtils.NO_ROOM_FOUND})
@@ -38,6 +39,15 @@ module.exports = {
                 return response({"error": errorUtils.ROOM_DOES_NOT_BELONG})
             } else {
                 roomRepository.deleteRoomForUser(roomId, response);
+            }
+        });
+    },
+    validateRoomCode: function (roomCode, response) {
+        roomRepository.getRoomByCode(roomCode, function (roomData) {
+            if (roomData === undefined) {
+                return response({"error": errorUtils.NO_ROOM_FOUND})
+            } else {
+                return response({"token": securityUtils.generateAccessToken({"guestName": "Guest"})});
             }
         });
     }

@@ -37,5 +37,8 @@ module.exports = {
             }
             return callback(res);
         });
+    },
+    generateAccessToken: function (payload) {
+        return jwt.sign({payload}, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '1d'});
     }
 }

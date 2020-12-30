@@ -1,7 +1,6 @@
 if (process.env.NODE_ENV !== 'production') {
     require('dotenv').config();
 }
-const jwt = require("jsonwebtoken");
 const authenticationRepository = require('../repository/UserRepository.js')
 const securityUtil = require('../utils/SecurityUtil')
 module.exports = {
@@ -11,7 +10,7 @@ module.exports = {
                 securityUtil.compareStrings(password, user.password, function (validationResult) {
                     if (validationResult) {
                         return callback({
-                            "token": generateAccessToken({
+                            "token": securityUtil.generateAccessToken({
                                 "username": user.username,
                                 "fullName": user.fullName,
                                 "userId": user.id
@@ -31,6 +30,3 @@ module.exports = {
     }
 }
 
-function generateAccessToken(user) {
-    return jwt.sign({user}, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '1d'});
-}

@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const securityUtils = require('../modules/utils/SecurityUtil');
-const roomService = require('../modules/room/roomService');
+const roomService = require('../modules/room/RoomService');
 const guestService = require('../modules/guests/GuestsService');
 const errorUtils = require('../modules/utils/ErrorConstants');
 
@@ -69,6 +69,19 @@ router.post('/add-guest', securityUtils.authenticateToken, (req, res) => {
         res.status(422).send({"error": "Body cannot be null!"});
     } else {
         guestService.addGuestToRoom(req.body, function (result) {
+            if (result === null) {
+                res.status(500).send("Internal Server Error");
+            } else {
+                res.status(201).send(result);
+            }
+        });
+    }
+});
+router.post('/validate-code', (req, res) => {
+    if (Object.keys(req.body).length === 0) {
+        res.status(422).send({"error": "Body cannot be null!"});
+    } else {
+        roomService.validateRoomCode(req.body.roomCode, function (result) {
             if (result === null) {
                 res.status(500).send("Internal Server Error");
             } else {
