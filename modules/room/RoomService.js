@@ -8,7 +8,7 @@ module.exports = {
                     console.log("Could not find any rooms by userId");
                     return response({
                         "response": null,
-                        "error": errorUtils.NO_ROOMS_FOUND
+                        "error": errorUtils.NO_ROOM_FOUND
                     });
                 } else {
                     return response({"response": searchResult, "error": null});

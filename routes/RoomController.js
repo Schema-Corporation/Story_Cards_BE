@@ -84,8 +84,10 @@ router.post('/validate-code', (req, res) => {
         roomService.validateRoomCode(req.body.roomCode, function (result) {
             if (result === null) {
                 res.status(500).send("Internal Server Error");
+            } else if (result.error !== undefined) {
+                res.status(422).send({"error": result.error});
             } else {
-                res.status(201).send(result);
+                res.status(200).send(result);
             }
         });
     }
