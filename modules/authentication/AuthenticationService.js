@@ -11,11 +11,12 @@ module.exports = {
                     if (validationResult) {
                         return callback({
                             "token": securityUtil.generateAccessToken({
-                                "username": user.username,
-                                "fullName": user.fullName,
-                                "userId": user.id
+                                "user": {
+                                    "username": user.username,
+                                    "fullName": user.fullName,
+                                    "userId": user.id
+                                }
                             }),
-                            "user": user
                         });
                     } else {
                         console.log("Password did not match!");
