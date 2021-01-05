@@ -6,7 +6,7 @@ const guestService = require('../modules/guests/GuestsService');
 const errorUtils = require('../modules/utils/ErrorConstants');
 
 router.get('/', securityUtils.authenticateToken, (req, res) => {
-    const userId = req.claims.user.userId;
+    const userId = req.claims.payload.user.userId;
     roomService.getRooms(userId, function (result) {
         const responseObject = result;
         if (responseObject.error === null) {
@@ -17,7 +17,7 @@ router.get('/', securityUtils.authenticateToken, (req, res) => {
     });
 });
 router.get('/:roomId', securityUtils.authenticateToken, (req, res) => {
-    const userId = req.claims.user.userId;
+    const userId = req.claims.payload.user.userId;
     const params = req.params
     const roomId = params.roomId;
     if (roomId === null || roomId === undefined) {
@@ -34,7 +34,7 @@ router.get('/:roomId', securityUtils.authenticateToken, (req, res) => {
     });
 });
 router.post('/', securityUtils.authenticateToken, (req, res) => {
-    const userId = req.claims.user.userId;
+    const userId = req.claims.payload.user.userId;
     if (Object.keys(req.body).length === 0) {
         res.status(422).send({"error": "Body cannot be null!"});
     } else {
@@ -48,7 +48,7 @@ router.post('/', securityUtils.authenticateToken, (req, res) => {
     }
 });
 router.delete('/:roomId', securityUtils.authenticateToken, (req, res) => {
-    const userId = req.claims.user.userId;
+    const userId = req.claims.payload.user.userId;
     const params = req.params
     const roomId = params.roomId;
     if (roomId === null || roomId === undefined) {
