@@ -45,8 +45,8 @@ module.exports = {
         let objectToInsert = {
             "id": uuid.v4(),
             "user_id": userId,
-            "max_guests": roomData.maxGuests,
-            "room_code": roomData.roomCode,
+            "max_guests": 30,//roomData.maxGuests,
+            "room_code": '123456',//roomData.roomCode,
             "created_date": LocalDate.LocalDate.now().toString(),
             "enabled": true,
             "room_name": roomData.roomName
