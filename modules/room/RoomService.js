@@ -45,9 +45,13 @@ module.exports = {
     validateRoomCode: function (roomCode, response) {
         roomRepository.getRoomByCode(roomCode, function (roomData) {
             if (roomData === undefined) {
-                return response({"error": errorUtils.NO_ROOM_FOUND})
+                return response({ "error": errorUtils.NO_ROOM_FOUND })
             } else {
-                return response({"token": securityUtils.generateAccessToken({"guestName": "Guest"})});
+                return response(
+                    {
+                        "token": securityUtils.generateAccessToken({ "guestName": "Guest" }),
+                        "roomId": roomData.id 
+                    });
             }
         });
     }
