@@ -16,7 +16,7 @@ module.exports = {
                 name: rawResult.name,
                 maxGuests: rawResult.max_guests,
                 roomCode: rawResult.room_code,
-                roomName: rawResult.name,
+                roomName: rawResult.room_name,
                 enabled: rawResult.enabled
             }))
             return callback(parsedResult);
