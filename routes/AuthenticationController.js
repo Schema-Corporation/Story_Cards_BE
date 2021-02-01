@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const authenticationService = require('../modules/authentication/AuthenticationService');
+const securityUtils = require('../modules/utils/SecurityUtil');
 
 router.post('/login', (req, res) => {
     const authHeader = req.headers.authorization
@@ -15,6 +16,16 @@ router.post('/login', (req, res) => {
             res.status(401).send("User and Password do not match!");
         }
     })
-})
+});
+router.get('/validate-role', securityUtils.authenticateToken, (req, res) => {
+    const payload = req.claims.payload;
+    if (payload.guestName !== undefined) {
+        res.send({"role": "GUEST"});
+    } else if (payload.user !== undefined) {
+        res.send({"role": "HOST"});
+    } else {
+        res.status(500).send({"Error": "Could not validate role"});
+    }
+});
 
 module.exports = router;
