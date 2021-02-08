@@ -29,7 +29,7 @@ module.exports = {
         );
     },
     createRoom: function (userId, roomObject, response) {
-        roomRepository.createRoomForUser(roomObject, userId, response);
+        roomRepository.createRoomForUser(roomObject, userId, generateRandomCode(), response);
     },
     deleteRoom: function (userId, roomId, response) {
         roomRepository.getRoomByRoomId(roomId, function (result) {
@@ -45,15 +45,38 @@ module.exports = {
     validateRoomCode: function (roomCode, response) {
         roomRepository.getRoomByCode(roomCode, function (roomData) {
             if (roomData === undefined) {
-                return response({ "error": errorUtils.NO_ROOM_FOUND })
+                return response({"error": errorUtils.NO_ROOM_FOUND})
             } else {
                 return response(
                     {
-                        "token": securityUtils.generateAccessToken({ "guestName": "Guest" }),
-                        "roomId": roomData.id 
+                        "token": securityUtils.generateAccessToken({"guestName": "Guest"}),
+                        "roomId": roomData.id
                     });
             }
         });
     }
+}
+
+function generateRandomCode() {
+    let flag = true;
+    let str = "";
+    while (flag) {
+        let counter = 0;
+        while (counter < 6) {
+            let randomNum = Math.random() * 127;
+            if ((randomNum >= 48 && randomNum <= 57) || (randomNum >= 65 && randomNum <= 90) || (randomNum >= 97 && randomNum <= 122)) {
+                str += String.fromCharCode(Math.round(randomNum));
+                counter++;
+            }
+        }
+        this.validateRoomCode(str, function (result) {
+            if (result.error === undefined) {
+                flag = false;
+            } else {
+                str = "";
+            }
+        });
+    }
+    return str;
 }
 

@@ -41,12 +41,12 @@ module.exports = {
         });
         databaseConfig.closeConnection();
     },
-    createRoomForUser: function (roomData, userId, callback) {
+    createRoomForUser: function (roomData, userId, roomCode, callback) {
         let objectToInsert = {
             "id": uuid.v4(),
             "user_id": userId,
-            "max_guests": 30,//roomData.maxGuests,
-            "room_code": '123456',//roomData.roomCode,
+            "max_guests": 30,
+            "room_code": roomCode,
             "created_date": LocalDate.LocalDate.now().toString(),
             "enabled": true,
             "room_name": roomData.roomName
