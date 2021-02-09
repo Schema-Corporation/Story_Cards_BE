@@ -15,9 +15,9 @@ module.exports = {
                                     "username": user.username,
                                     "fullName": user.fullName,
                                     "userId": user.id
-                                },
-                                "fullName": user.fullName
+                                }
                             }),
+                            "fullName": user.fullName
                         });
                     } else {
                         console.log("Password did not match!");
