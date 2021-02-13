@@ -29,7 +29,18 @@ module.exports = {
         );
     },
     createRoom: function (userId, roomObject, response) {
-        roomRepository.createRoomForUser(roomObject, userId, generateRandomCode(), response);
+        const code = generateRandomCode();
+        roomRepository.getRoomByCode(code, function (result) {
+            if (result === null || result === undefined) {
+                roomRepository.createRoomForUser(roomObject, userId, generateRandomCode(), function (createResult) {
+                    return response(createResult);
+                });
+            } else {
+                roomRepository.createRoomForUser(roomObject, userId, generateRandomCode(), function (createResult) {
+                    return response(createResult);
+                });
+            }
+        });
     },
     deleteRoom: function (userId, roomId, response) {
         roomRepository.getRoomByRoomId(roomId, function (result) {
@@ -58,24 +69,14 @@ module.exports = {
 }
 
 function generateRandomCode() {
-    let flag = true;
     let str = "";
-    while (flag) {
-        let counter = 0;
-        while (counter < 6) {
-            let randomNum = Math.random() * 127;
-            if ((randomNum >= 48 && randomNum <= 57) || (randomNum >= 65 && randomNum <= 90) || (randomNum >= 97 && randomNum <= 122)) {
-                str += String.fromCharCode(Math.round(randomNum));
-                counter++;
-            }
+    let counter = 0;
+    while (counter < 6) {
+        let randomNum = Math.random() * 127;
+        if ((randomNum >= 48 && randomNum <= 57) || (randomNum >= 65 && randomNum <= 90) || (randomNum >= 97 && randomNum <= 122)) {
+            str += String.fromCharCode(Math.round(randomNum));
+            counter++;
         }
-        this.validateRoomCode(str, function (result) {
-            if (result.error === undefined) {
-                flag = false;
-            } else {
-                str = "";
-            }
-        });
     }
     return str;
 }

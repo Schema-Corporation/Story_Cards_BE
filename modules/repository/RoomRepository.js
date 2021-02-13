@@ -45,7 +45,7 @@ module.exports = {
         let objectToInsert = {
             "id": uuid.v4(),
             "user_id": userId,
-            "max_guests": 30,
+            "max_guests": roomData.maxGuests,
             "room_code": roomCode,
             "created_date": LocalDate.LocalDate.now().toString(),
             "enabled": true,
@@ -56,7 +56,7 @@ module.exports = {
                 console.log(err);
                 return callback(null);
             }
-            return this.getRoomByName(roomData.roomName, userId, callback);
+            return this.getRoomByRoomId(objectToInsert.id, callback);
         });
         databaseConfig.closeConnection();
     },
