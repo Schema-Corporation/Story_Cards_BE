@@ -29,18 +29,7 @@ module.exports = {
         );
     },
     createRoom: function (userId, roomObject, response) {
-        const code = generateRandomCode();
-        roomRepository.getRoomByCode(code, function (result) {
-            if (result === null || result === undefined) {
-                roomRepository.createRoomForUser(roomObject, userId, generateRandomCode(), function (createResult) {
-                    return response(createResult);
-                });
-            } else {
-                roomRepository.createRoomForUser(roomObject, userId, generateRandomCode(), function (createResult) {
-                    return response(createResult);
-                });
-            }
-        });
+        createRoomLoop(roomObject, userId, response);
     },
     deleteRoom: function (userId, roomId, response) {
         roomRepository.getRoomByRoomId(roomId, function (result) {
@@ -79,5 +68,18 @@ function generateRandomCode() {
         }
     }
     return str;
+}
+
+function createRoomLoop(roomObject, userId, callback) {
+    let code = generateRandomCode();
+    roomRepository.getRoomByCode(code, function (result) {
+        if (result === null || result === undefined) {
+            roomRepository.createRoomForUser(roomObject, userId, code, function (createResult) {
+                return callback(createResult);
+            });
+        } else {
+            createRoomLoop(roomObject, userId, callback);
+        }
+    });
 }
 
