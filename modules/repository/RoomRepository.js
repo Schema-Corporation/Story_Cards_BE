@@ -1,6 +1,8 @@
+require('dotenv').config();
 const databaseConfig = require('../config/DatabaseConfig');
 const uuid = require('uuid');
 const LocalDate = require("@js-joda/core");
+
 
 module.exports = {
     getRoomsByUserId: function (userId, callback) {
@@ -45,7 +47,7 @@ module.exports = {
         let objectToInsert = {
             "id": uuid.v4(),
             "user_id": userId,
-            "max_guests": roomData.maxGuests,
+            "max_guests": process.env.MAX_GUESTS,
             "room_code": roomCode,
             "created_date": LocalDate.LocalDate.now().toString(),
             "enabled": true,
