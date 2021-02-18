@@ -35,6 +35,14 @@ module.exports = {
         });
         databaseConfig.closeConnection();
     },
+    updateGuest: function (guestId, status, callback) {
+        databaseConfig.getSession().query('UPDATE guest SET status = ? where id = ?', [status, guestId], (err, result) => {
+            if (err) return callback(err);
+
+            return this.findGuestById(guestId, callback);
+        });
+        databaseConfig.closeConnection();
+    },
     getRoomGuests: function (roomId, callback) {
         databaseConfig.getSession().query('SELECT id,identifier,room_id,status,enabled FROM guest WHERE room_id = ?', roomId, (err, rows) => {
             if (err) return callback(err);

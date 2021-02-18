@@ -117,4 +117,15 @@ router.get('/guests/:roomId', securityUtils.authenticateToken, function (req, re
         }
     });
 });
+router.put('/guests/', securityUtils.authenticateToken, function (req, res) {
+    const guestId = req.claims.payload.guestId;
+    const status = req.body.status;
+    guestService.updateGuest(guestId, status, function (result) {
+        if (result === null || result === undefined) {
+            res.status(200).send({"guests": []});
+        } else {
+            res.status(200).send(result);
+        }
+    });
+});
 module.exports = router;

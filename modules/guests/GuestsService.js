@@ -25,6 +25,12 @@ module.exports = {
         } else {
             response(guestList);
         }
+    },
+    updateGuest: function(guestId, status, response) {
+        guestRepository.updateGuest(guestId, status, function (result) {
+            // update guest in list of guests in redis
+            return response(result);
+        }); 
     }
 }
 
