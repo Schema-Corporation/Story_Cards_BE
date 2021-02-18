@@ -97,9 +97,17 @@ router.ws('/guests/:roomId', function (ws, req) {
         const params = req.params
         const roomId = params.roomId;
         console.log(msg);
-        guestService.getRoomGuests(roomId,function (result){
+        guestService.getRoomGuests(roomId, function (result) {
             ws.send(result);
         });
     });
+});
+router.get('/guests/:roomId', securityUtils.authenticateToken, function (ws, req) {
+        const params = req.params
+        const roomId = params.roomId;
+        console.log(msg);
+        guestService.getRoomGuests(roomId, function (result) {
+            ws.send(result);
+        });
 });
 module.exports = router;
