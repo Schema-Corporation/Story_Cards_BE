@@ -7,6 +7,7 @@ const port = normalizePort(process.env.PORT || '3000');
 const bodyParser = require('body-parser');
 const path = require('path');
 const logger = require('morgan');
+const expressWs = require('express-ws')(app);
 
 const authenticationController = require('./routes/AuthenticationController');
 const canvasController = require('./routes/CanvasController');
@@ -30,7 +31,6 @@ app.use('', registrationController);
 app.get('/', (req, res) => {
     res.render('HealthCheck', {title: "Health Check for Story Cards Services", message: "Services are healthy!"});
 })
-
 app.use(function (req, res, next) {
     next(createError(404, "Page not found!", {expose: false}));
 });

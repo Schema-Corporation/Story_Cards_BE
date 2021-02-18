@@ -92,5 +92,14 @@ router.post('/validate-code', (req, res) => {
         });
     }
 });
-
+router.ws('/guests/:roomId', function (ws, req) {
+    ws.on('message', function (msg) {
+        const params = req.params
+        const roomId = params.roomId;
+        console.log(msg);
+        guestService.getRoomGuests(roomId,function (result){
+            ws.send(result);
+        });
+    });
+});
 module.exports = router;
