@@ -19,7 +19,7 @@ router.post('/login', (req, res) => {
 });
 router.get('/validate-role', securityUtils.authenticateToken, (req, res) => {
     const payload = req.claims.payload;
-    if (payload.guestName !== undefined) {
+    if (payload.guestId !== undefined) {
         res.send({"role": "GUEST"});
     } else if (payload.user !== undefined) {
         res.send({"role": "HOST"});

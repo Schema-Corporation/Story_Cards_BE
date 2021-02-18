@@ -49,7 +49,6 @@ module.exports = {
             } else {
                 return response(
                     {
-                        "token": securityUtils.generateAccessToken({"guestName": "Guest"}),
                         "roomId": roomData.id
                     });
             }

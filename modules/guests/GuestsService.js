@@ -13,7 +13,8 @@ module.exports = {
                 "token": securityUtils.generateAccessToken({
                     "roomId": result.roomId,
                     "guestId": result.id
-                }), "guestData": result
+                }), 
+                "guestData": result
             });
         });
     },
