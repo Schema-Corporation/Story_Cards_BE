@@ -64,7 +64,7 @@ router.delete('/:roomId', securityUtils.authenticateToken, (req, res) => {
         }
     });
 });
-router.post('/add-guest', securityUtils.authenticateToken, (req, res) => {
+router.post('/add-guest', (req, res) => {
     if (Object.keys(req.body).length === 0) {
         res.status(422).send({"error": "Body cannot be null!"});
     } else {

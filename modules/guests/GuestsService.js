@@ -1,5 +1,6 @@
 const guestRepository = require('../repository/GuestRepository')
 const redis = require('../config/RedisConfig')
+const securityUtils = require('../utils/SecurityUtil');
 
 module.exports = {
     addGuestToRoom: function (request, response) {
@@ -8,7 +9,12 @@ module.exports = {
             auxList.push(request.roomId);
             auxList.push(JSON.stringify(result));
             insertRedisList(auxList);
-            return response(result);
+            return response({
+                "token": securityUtils.generateAccessToken({
+                    "roomId": result.roomId,
+                    "guestId": result.id
+                }), "guestData": result
+            });
         });
     },
     getRoomGuests: function (roomId, response) {
