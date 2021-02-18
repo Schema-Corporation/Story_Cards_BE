@@ -16,7 +16,7 @@ router.get('/', securityUtils.authenticateToken, (req, res) => {
         }
     });
 });
-router.get('/:roomId', securityUtils.authenticateToken, (req, res) => {
+router.get('/detail/:roomId', securityUtils.authenticateToken, (req, res) => {
     const userId = req.claims.payload.user.userId;
     const params = req.params
     const roomId = params.roomId;
@@ -102,12 +102,15 @@ router.ws('/guests/:roomId', function (ws, req) {
         });
     });
 });
-router.get('/guests/:roomId', securityUtils.authenticateToken, function (ws, req) {
-        const params = req.params
-        const roomId = params.roomId;
-        console.log(msg);
-        guestService.getRoomGuests(roomId, function (result) {
-            ws.send(result);
-        });
+router.get('/guests/:roomId', securityUtils.authenticateToken, function (req, res) {
+    const params = req.params;
+    const roomId = params.roomId;
+    guestService.getRoomGuests(roomId, function (result) {
+        if (result === null || result === undefined || result[0] === undefined) {
+            res.status(200).send({"guests": []});
+        } else {
+            res.status(200).send(result);
+        }
+    });
 });
 module.exports = router;
