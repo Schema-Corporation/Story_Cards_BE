@@ -98,7 +98,11 @@ router.ws('/guests/:roomId', function (ws, req) {
         const roomId = params.roomId;
         console.log(msg);
         guestService.getRoomGuests(roomId, function (result) {
-            ws.send(result);
+            if (result === null || result === undefined) {
+                ws.send({"guests": []});
+            } else {
+                ws.send(result);
+            }
         });
     });
 });
@@ -106,7 +110,7 @@ router.get('/guests/:roomId', securityUtils.authenticateToken, function (req, re
     const params = req.params;
     const roomId = params.roomId;
     guestService.getRoomGuests(roomId, function (result) {
-        if (result === null || result === undefined || result[0] === undefined) {
+        if (result === null || result === undefined) {
             res.status(200).send({"guests": []});
         } else {
             res.status(200).send(result);

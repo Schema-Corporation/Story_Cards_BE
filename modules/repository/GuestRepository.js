@@ -42,7 +42,7 @@ module.exports = {
             if (rawResult === undefined) {
                 return callback(null);
             } else {
-                let parsedResult = new Array(rawResult.size);
+                let parsedResult = new Array(0);
                 for (const result of rawResult) {
                     parsedResult.push({
                         id: result.id,
