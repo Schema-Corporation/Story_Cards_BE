@@ -92,25 +92,31 @@ router.post('/validate-code', (req, res) => {
         });
     }
 });
-router.ws('/guests/:roomId', function (ws, req) {
+router.ws('/guests/ws/:roomId', function (ws, req) {
+    ws.on('connection', function (conn) {
+        console.log("Connected");
+    });
     ws.on('message', function (msg) {
         const params = req.params
         const roomId = params.roomId;
         console.log(msg);
         guestService.getRoomGuests(roomId, function (result) {
             if (result === null || result === undefined) {
+                console.log("Sending empty list");
                 ws.send({"guests": []});
             } else {
+                console.log("This is the result sent:" + result)
                 ws.send(result);
             }
         });
     });
 });
-router.get('/guests/:roomId', securityUtils.authenticateToken, function (req, res) {
+router.get('/guests/:roomId', function (req, res) {
     const params = req.params;
     const roomId = params.roomId;
     guestService.getRoomGuests(roomId, function (result) {
-        if (result === null || result === undefined) {
+        console.log(result);
+        if (result === null || result === undefined || result.length < 1) {
             res.status(200).send({"guests": []});
         } else {
             res.status(200).send(result);
