@@ -12,6 +12,7 @@ const expressWs = require('express-ws')(app);
 const authenticationController = require('./routes/AuthenticationController');
 const canvasController = require('./routes/CanvasController');
 const roomController = require('./routes/RoomController');
+const gameController = require('./routes/GameController');
 const registrationController = require('./routes/RegistrationController');
 
 app.set('views', path.join(__dirname, 'views'));
@@ -26,6 +27,7 @@ app.use(cors());
 app.use('', authenticationController);
 app.use('/canvas', canvasController);
 app.use('/room', roomController);
+app.use('/game', gameController);
 app.use('', registrationController);
 
 app.get('/', (req, res) => {
