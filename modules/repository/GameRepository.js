@@ -25,13 +25,15 @@ module.exports = {
                 console.log(err);
                 return callback(null);
             }
-            let parsedResult = [];
-            result.forEach(rawResult => parsedResult.push({
+            let rawResult = result[0];
+            if (rawResult === undefined) {
+                return callback(rawResult);
+            }
+            return callback({
                 id: rawResult.id,
                 roomId: rawResult.room_id,
                 turn: rawResult.turn
-            }))
-            return callback(parsedResult);
+            })
         });
         databaseConfig.closeConnection();
     }
