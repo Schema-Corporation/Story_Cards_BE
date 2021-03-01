@@ -18,6 +18,12 @@ module.exports = {
             });
         });
     },
+    removeGuest: function (guestId, response) {
+        guestRepository.removeGuest(guestId, function (result) {
+            // remove guest in redis list
+            return response(result);
+        });
+    },
     getRoomGuests: function (roomId, response) {
         const guestList = getRedisListIfExists(roomId);
         if (guestList === undefined) {

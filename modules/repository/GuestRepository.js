@@ -35,6 +35,16 @@ module.exports = {
         });
         databaseConfig.closeConnection();
     },
+    removeGuest: function (guestId, callback) {
+        databaseConfig.getSession().query('DELETE FROM guest where id = ?', guestId, (err, result) => {
+            if (err) {
+                console.log(err);
+                return callback(null);
+            }
+            return callback(guestId);
+        });
+        databaseConfig.closeConnection();
+    },
     updateGuest: function (guestId, status, callback) {
         databaseConfig.getSession().query('UPDATE guest SET status = ? where id = ?', [status, guestId], (err, result) => {
             if (err) return callback(err);
