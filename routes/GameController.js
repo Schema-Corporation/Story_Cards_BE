@@ -6,6 +6,8 @@ const errorUtils = require('../modules/utils/ErrorConstants');
 
 let guestWaitingRoom = {};
 
+let challengesApprovalGuestRoom = {};
+
 router.post('/', securityUtils.authenticateToken, (req, res) => {
     const userId = req.claims.payload.user.userId;
     const roomId = req.body.roomId;
@@ -29,6 +31,21 @@ router.post('/', securityUtils.authenticateToken, (req, res) => {
             }
         });
     }
+});
+
+router.ws('/challenges-approval/ws/:guestId', function(ws, req) {
+    challengesApprovalGuestRoom[req.params.guestId] = challengesApprovalGuestRoom[req.params.guestId] || [];
+    challengesApprovalGuestRoom[req.params.guestId].push(ws);
+
+    ws.on('close', function() {
+        var index = challengesApprovalGuestRoom[req.params.roomId].indexOf(ws);
+        if (index != -1) {
+            challengesApprovalGuestRoom[req.params.roomId].splice(index, 1);
+            if (challengesApprovalGuestRoom[req.params.roomId].length == 0) {
+                challengesApprovalGuestRoom[req.params.roomId] = null;
+            }
+        }
+    });
 });
 
 router.ws('/game-waiting-room/ws/:roomId', function (ws, req) {
