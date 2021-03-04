@@ -7,17 +7,6 @@ const errorUtils = require('../modules/utils/ErrorConstants');
 
 let guestListClients = {};
 
-router.get('/', securityUtils.authenticateToken, (req, res) => {
-    const userId = req.claims.payload.user.userId;
-    roomService.getRooms(userId, function (result) {
-        const responseObject = result;
-        if (responseObject.error === null) {
-            res.status(200).send(responseObject.response);
-        } else if (responseObject.error === errorUtils.NO_ROOM_FOUND) {
-            res.status(200).send([]);
-        }
-    });
-});
 router.get('/detail/:roomId', securityUtils.authenticateToken, (req, res) => {
     const userId = req.claims.payload.user.userId;
     const params = req.params
@@ -35,20 +24,7 @@ router.get('/detail/:roomId', securityUtils.authenticateToken, (req, res) => {
         }
     });
 });
-router.post('/', securityUtils.authenticateToken, (req, res) => {
-    const userId = req.claims.payload.user.userId;
-    if (Object.keys(req.body).length === 0) {
-        res.status(422).send({"error": "Body cannot be null!"});
-    } else {
-        roomService.createRoom(userId, req.body, function (result) {
-            if (result === null) {
-                res.status(500).send("Internal Server Error");
-            } else {
-                res.status(201).send(result);
-            }
-        });
-    }
-});
+
 router.post('/add-guest', (req, res) => {
     if (Object.keys(req.body).length === 0) {
         res.status(422).send({"error": "Body cannot be null!"});
@@ -209,4 +185,49 @@ router.delete('/:roomId', securityUtils.authenticateToken, (req, res) => {
         }
     });
 });
+router.put('/:roomId', securityUtils.authenticateToken, (req, res) => {
+    const userId = req.claims.payload.user.userId;
+    const roomId = req.params.roomId;
+    const enabled = req.body.enabled;
+    if (roomId === null || roomId === undefined) {
+        res.status(422).send({"error": "Room Id is required!"})
+    }
+    roomService.updateRoom(userId, roomId, enabled, function (result) {
+        if (result === null) {
+            res.status(500).send("Internal Server Error");
+        } else if (result.error != null) {
+            res.status(422).send(result);
+        } else {
+            res.status(204).send();
+        }
+    });
+});
+
+router.post('/', securityUtils.authenticateToken, (req, res) => {
+    const userId = req.claims.payload.user.userId;
+    if (Object.keys(req.body).length === 0) {
+        res.status(422).send({"error": "Body cannot be null!"});
+    } else {
+        roomService.createRoom(userId, req.body, function (result) {
+            if (result === null) {
+                res.status(500).send("Internal Server Error");
+            } else {
+                res.status(201).send(result);
+            }
+        });
+    }
+});
+
+router.get('/', securityUtils.authenticateToken, (req, res) => {
+    const userId = req.claims.payload.user.userId;
+    roomService.getRooms(userId, function (result) {
+        const responseObject = result;
+        if (responseObject.error === null) {
+            res.status(200).send(responseObject.response);
+        } else if (responseObject.error === errorUtils.NO_ROOM_FOUND) {
+            res.status(200).send([]);
+        }
+    });
+});
+
 module.exports = router;

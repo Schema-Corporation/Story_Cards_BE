@@ -43,6 +43,12 @@ module.exports = {
         });
         databaseConfig.closeConnection();
     },
+    getRoomByCodeForCreation: function (roomCode, callback) {
+        databaseConfig.getSession().query('SELECT id,user_id,room_name,max_guests,room_code,enabled FROM room r WHERE r.room_code = ? ORDER BY created_date desc', roomCode, (err, result) => {
+            parseSingleResult(err, result, callback);
+        });
+        databaseConfig.closeConnection();
+    },
     createRoomForUser: function (roomData, userId, roomCode, callback) {
         let objectToInsert = {
             "id": uuid.v4(),
@@ -59,6 +65,16 @@ module.exports = {
                 return callback(null);
             }
             return this.getRoomByRoomId(objectToInsert.id, callback);
+        });
+        databaseConfig.closeConnection();
+    },
+    updateRoom: function (roomId, enabled, callback) {
+        databaseConfig.getSession().query('UPDATE room r SET r.enabled = ? WHERE r.id = ?', [enabled, roomId], (err, result) => {
+            if (err) {
+                console.log(err);
+                return callback(null);
+            }
+            return callback(result);
         });
         databaseConfig.closeConnection();
     },

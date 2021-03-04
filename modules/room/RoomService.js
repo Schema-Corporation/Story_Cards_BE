@@ -31,6 +31,17 @@ module.exports = {
     createRoom: function (userId, roomObject, response) {
         createRoomLoop(roomObject, userId, response);
     },
+    updateRoom: function (userId, roomId, enabled, response) {
+        roomRepository.getRoomByRoomId(roomId, function (result) {
+            if (result === undefined) {
+                return response({"error": errorUtils.NO_ROOM_FOUND})
+            } else if (result.userId !== userId) {
+                return response({"error": errorUtils.ROOM_DOES_NOT_BELONG})
+            } else {
+                roomRepository.updateRoom(roomId, enabled, response);
+            }
+        });
+    },
     deleteRoom: function (userId, roomId, response) {
         roomRepository.getRoomByRoomId(roomId, function (result) {
             if (result === undefined) {
@@ -71,7 +82,7 @@ function generateRandomCode() {
 
 function createRoomLoop(roomObject, userId, callback) {
     let code = generateRandomCode();
-    roomRepository.getRoomByCode(code, function (result) {
+    roomRepository.getRoomByCodeForCreation(code, function (result) {
         if (result === null || result === undefined) {
             roomRepository.createRoomForUser(roomObject, userId, code, function (createResult) {
                 return callback(createResult);
