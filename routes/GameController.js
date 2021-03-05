@@ -18,7 +18,7 @@ router.post('/', securityUtils.authenticateToken, (req, res) => {
             if (result === null) {
                 res.status(500).send("Internal Server Error");
             } else {
-                var responseObject = {
+                let responseObject = {
                     operation: 'start-game',
                     gameId: result.id
                 }
@@ -33,30 +33,30 @@ router.post('/', securityUtils.authenticateToken, (req, res) => {
     }
 });
 
-router.ws('/challenges-host-approval/ws/:gameId', function(ws, req) {
+router.ws('/challenges-host-approval/ws/:gameId', function (ws, req) {
     challengesHostGuestRoom[req.params.gameId] = challengesHostGuestRoom[req.params.gameId] || [];
     challengesHostGuestRoom[req.params.gameId].push(ws);
 
-    ws.on('close', function() {
-        var index = challengesHostGuestRoom[req.params.gameId].indexOf(ws);
-        if (index != -1) {
+    ws.on('close', function () {
+        let index = challengesHostGuestRoom[req.params.gameId].indexOf(ws);
+        if (index !== -1) {
             challengesHostGuestRoom[req.params.gameId].splice(index, 1);
-            if (challengesHostGuestRoom[req.params.gameId].length == 0) {
+            if (challengesHostGuestRoom[req.params.gameId].length === 0) {
                 challengesHostGuestRoom[req.params.gameId] = null;
             }
         }
     });
 });
 
-router.ws('/challenges-approval/ws/:guestId', function(ws, req) {
+router.ws('/challenges-approval/ws/:guestId', function (ws, req) {
     challengesApprovalGuestRoom[req.params.guestId] = challengesApprovalGuestRoom[req.params.guestId] || [];
     challengesApprovalGuestRoom[req.params.guestId].push(ws);
 
-    ws.on('close', function() {
-        var index = challengesApprovalGuestRoom[req.params.roomId].indexOf(ws);
-        if (index != -1) {
+    ws.on('close', function () {
+        let index = challengesApprovalGuestRoom[req.params.roomId].indexOf(ws);
+        if (index !== -1) {
             challengesApprovalGuestRoom[req.params.roomId].splice(index, 1);
-            if (challengesApprovalGuestRoom[req.params.roomId].length == 0) {
+            if (challengesApprovalGuestRoom[req.params.roomId].length === 0) {
                 challengesApprovalGuestRoom[req.params.roomId] = null;
             }
         }
@@ -64,15 +64,15 @@ router.ws('/challenges-approval/ws/:guestId', function(ws, req) {
 });
 
 router.ws('/game-waiting-room/ws/:roomId', function (ws, req) {
-    
+
     guestWaitingRoom[req.params.roomId] = guestWaitingRoom[req.params.roomId] || [];
     guestWaitingRoom[req.params.roomId].push(ws);
 
-    ws.on('close', function() {
-        var index = guestWaitingRoom[req.params.roomId].indexOf(ws);
-        if (index != -1) {
+    ws.on('close', function () {
+        let index = guestWaitingRoom[req.params.roomId].indexOf(ws);
+        if (index !== -1) {
             guestWaitingRoom[req.params.roomId].splice(index, 1);
-            if (guestWaitingRoom[req.params.roomId].length == 0) {
+            if (guestWaitingRoom[req.params.roomId].length === 0) {
                 guestWaitingRoom[req.params.roomId] = null;
             }
         }

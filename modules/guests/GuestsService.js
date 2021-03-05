@@ -13,40 +13,53 @@ module.exports = {
                 "token": securityUtils.generateAccessToken({
                     "roomId": result.roomId,
                     "guestId": result.id
-                }), 
+                }),
                 "guestData": result
             });
         });
     },
-    removeGuest: function (guestId, response) {
+    removeGuest: function (roomId, guestId, response) {
         guestRepository.removeGuest(guestId, function (result) {
-            // remove guest in redis list
+            getRedisListIfExists(roomId, function (result) {
+                result.forEach(guest => {
+                    if (guest.id === guestId) {
+                        removeItemFromRedisList(roomId, JSON.stringify(guest));
+                    }
+                })
+            })
             return response(result);
         });
     },
     getRoomGuests: function (roomId, response) {
-        const guestList = getRedisListIfExists(roomId);
-        if (guestList === undefined) {
-            guestRepository.getRoomGuests(roomId, response);
-        } else {
-            response(guestList);
-        }
+        getRedisListIfExists(roomId, response);
     },
-    updateGuest: function(guestId, status, response) {
+    updateGuest: function (guestId, status, response) {
         guestRepository.updateGuest(guestId, status, function (result) {
             // update guest in list of guests in redis
             return response(result);
-        }); 
+        });
     }
 }
 
-function getRedisListIfExists(key) {
+function getRedisListIfExists(key, response) {
     redis.getRedisClient().lrange(key, 0, -1, function (err, reply) {
         if (err) {
+            guestRepository.getRoomGuests(key, response);
             console.log(err);
         }
+        if (reply === undefined || reply === null || reply.length < 1) {
+            guestRepository.getRoomGuests(key, response);
+        }
         console.log(reply);
-        return reply;
+        let parsedReply = new Array(0);
+        reply.forEach(rawReply => parsedReply.push(JSON.parse(rawReply)));
+        return response(parsedReply);
+    });
+}
+
+function removeItemFromRedisList(key, elementToRemove) {
+    redis.getRedisClient().lrem(key, 0, elementToRemove, function (err, data) {
+        console.log(data);
     });
 }
 

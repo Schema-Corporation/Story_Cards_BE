@@ -82,7 +82,7 @@ router.delete('/remove-guest', securityUtils.authenticateToken, (req, res) => {
     if (guestId === null || guestId === undefined) {
         res.status(422).send({"error": "Guest Id is required!"})
     } else {
-        guestService.removeGuest(guestId, function (result) {
+        guestService.removeGuest(roomId, guestId, function (result) {
             if (result === null) {
                 res.status(500).send("Internal Server Error");
             } else if (result.error != null) {
@@ -120,15 +120,15 @@ router.post('/validate-code', (req, res) => {
 });
 
 router.ws('/guests/ws/:roomId', function (ws, req) {
-    
+
     guestListClients[req.params.roomId] = guestListClients[req.params.roomId] || [];
     guestListClients[req.params.roomId].push(ws);
 
-    ws.on('close', function() {
-        var index = guestListClients[req.params.roomId].indexOf(ws);
-        if (index != -1) {
+    ws.on('close', function () {
+        let index = guestListClients[req.params.roomId].indexOf(ws);
+        if (index !== -1) {
             guestListClients[req.params.roomId].splice(index, 1);
-            if (guestListClients[req.params.roomId].length == 0) {
+            if (guestListClients[req.params.roomId].length === 0) {
                 guestListClients[req.params.roomId] = null;
             }
         }
@@ -155,8 +155,8 @@ router.put('/guests/', securityUtils.authenticateToken, function (req, res) {
         if (result === null || result === undefined) {
             res.status(200).send({"guests": []});
         } else {
-            var responseObject = {
-                operation: status == 1 ? 'leave-waiting-room' : status == 2 ? 'enter-waiting-room': 'undefined',
+            let responseObject = {
+                operation: status === 1 ? 'leave-waiting-room' : status === 2 ? 'enter-waiting-room' : 'undefined',
                 guestId: guestId
             }
             if (guestListClients[roomId] != null && guestListClients[roomId].length > 0) {

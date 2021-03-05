@@ -8,7 +8,6 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const logger = require('morgan');
 const expressWs = require('express-ws')(app);
-
 const authenticationController = require('./routes/AuthenticationController');
 const canvasController = require('./routes/CanvasController');
 const roomController = require('./routes/RoomController');
