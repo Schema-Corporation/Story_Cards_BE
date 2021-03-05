@@ -7,31 +7,7 @@ const errorUtils = require('../modules/utils/ErrorConstants');
 let guestWaitingRoom = {};
 let challengesApprovalGuestRoom = {};
 let challengesHostGuestRoom = {};
-
-router.post('/', securityUtils.authenticateToken, (req, res) => {
-    const userId = req.claims.payload.user.userId;
-    const roomId = req.body.roomId;
-    if (Object.keys(req.body).length === 0) {
-        res.status(422).send({"error": "Body cannot be null!"});
-    } else {
-        gameService.createGame(userId, req.body, function (result) {
-            if (result === null) {
-                res.status(500).send("Internal Server Error");
-            } else {
-                let responseObject = {
-                    operation: 'start-game',
-                    gameId: result.id
-                }
-                if (guestWaitingRoom[roomId] != null && guestWaitingRoom[roomId].length > 0) {
-                    guestWaitingRoom[roomId].forEach(client => {
-                        client.send(JSON.stringify(responseObject));
-                    });
-                }
-                res.status(201).send(result);
-            }
-        });
-    }
-});
+let answersRoom = {};
 
 router.ws('/challenges-host-approval/ws/:gameId', function (ws, req) {
     challengesHostGuestRoom[req.params.gameId] = challengesHostGuestRoom[req.params.gameId] || [];
@@ -77,6 +53,75 @@ router.ws('/game-waiting-room/ws/:roomId', function (ws, req) {
             }
         }
     });
+});
+
+router.post('/answer/:gameId', securityUtils.authenticateToken, (req, res) => {
+    const guestId = req.claims.payload.guestId;
+    const gameId = req.params.gameId;
+    const answerData = req.body.answerData;
+    if (Object.keys(req.body).length === 0) {
+        res.status(422).send({"error": "Body cannot be null!"});
+    } else {
+        // post to answers services
+        // notify 
+        var responseObject = {
+            operation: 'answer-received',
+            answer: answerData
+        }
+        if (answersRoom[gameId] != null && answersRoom[gameId].length > 0) {
+            answersRoom[gameId].forEach(client => {
+                client.send(JSON.stringify(responseObject));
+            });
+        }
+        res.status(204).send();
+    }
+});
+
+router.get('/evaluate-answers/:gameId', securityUtils.authenticateToken, (req, res) => {
+    const userId = req.claims.payload.user.userId;
+    const gameId = req.params.gameId;
+    res.status(200).send([]);
+});
+
+router.ws('/evaluate-answers/ws/:gameId', function (ws, req) {
+    
+    answersRoom[req.params.gameId] = answersRoom[req.params.gameId] || [];
+    answersRoom[req.params.gameId].push(ws);
+
+    ws.on('close', function() {
+        var index = answersRoom[req.params.gameId].indexOf(ws);
+        if (index != -1) {
+            answersRoom[req.params.gameId].splice(index, 1);
+            if (answersRoom[req.params.gameId].length == 0) {
+                answersRoom[req.params.gameId] = null;
+            }
+        }
+    });
+});
+
+router.post('/', securityUtils.authenticateToken, (req, res) => {
+    const userId = req.claims.payload.user.userId;
+    const roomId = req.body.roomId;
+    if (Object.keys(req.body).length === 0) {
+        res.status(422).send({"error": "Body cannot be null!"});
+    } else {
+        gameService.createGame(userId, req.body, function (result) {
+            if (result === null) {
+                res.status(500).send("Internal Server Error");
+            } else {
+                var responseObject = {
+                    operation: 'start-game',
+                    gameId: result.id
+                }
+                if (guestWaitingRoom[roomId] != null && guestWaitingRoom[roomId].length > 0) {
+                    guestWaitingRoom[roomId].forEach(client => {
+                        client.send(JSON.stringify(responseObject));
+                    });
+                }
+                res.status(201).send(result);
+            }
+        });
+    }
 });
 
 module.exports = router;
