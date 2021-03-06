@@ -60,7 +60,8 @@ router.post('/add-challenge', securityUtils.authenticateToken, (req, res) => {
         res.status(422).send({"error": "Body cannot be null!"});
     } else {
         gameService.addChallengeToGame(requestBody, function (result) {
-            res.status(201).send({"challengesOnList": result});
+            res.status(201);
+            res.send({"challengesOnList": result});
         });
     }
 });
@@ -70,7 +71,22 @@ router.get('/challenges/:gameId', securityUtils.authenticateToken, (req, res) =>
         res.status(422).send({"error": "Game Id must not be null"});
     } else {
         gameService.getChallengesFromWaitingRoom(gameId, function (result) {
-            res.status(200).send(result);
+            res.status(200);
+            res.send(result);
+        });
+    }
+});
+router.put('/challenges/:gameId', securityUtils.authenticateToken, (req, res) => {
+    const gameId = req.params.gameId;
+    const requestBody = req.body;
+    if (gameId === null || gameId === undefined) {
+        res.status(422).send({"error": "Game Id must not be null"});
+    } else if (Object.keys(req.body).length === 0) {
+        res.status(422).send({"error": "Body cannot be null!"});
+    } else {
+        gameService.editChallengeStatus(gameId, requestBody.guestId, requestBody.status, function (result) {
+            res.status(200);
+            res.send(result);
         });
     }
 });
