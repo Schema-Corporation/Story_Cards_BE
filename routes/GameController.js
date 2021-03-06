@@ -54,7 +54,26 @@ router.ws('/game-waiting-room/ws/:roomId', function (ws, req) {
         }
     });
 });
-
+router.post('/add-challenge', securityUtils.authenticateToken, (req, res) => {
+    const requestBody = req.body;
+    if (Object.keys(req.body).length === 0) {
+        res.status(422).send({"error": "Body cannot be null!"});
+    } else {
+        gameService.addChallengeToGame(requestBody, function (result) {
+            res.status(201).send({"challengesOnList": result});
+        });
+    }
+});
+router.get('/challenges/:gameId', securityUtils.authenticateToken, (req, res) => {
+    const gameId = req.params.gameId;
+    if (gameId === null || gameId === undefined) {
+        res.status(422).send({"error": "Game Id must not be null"});
+    } else {
+        gameService.getChallengesFromWaitingRoom(gameId, function (result) {
+            res.status(200).send(result);
+        });
+    }
+});
 router.post('/answer/:gameId', securityUtils.authenticateToken, (req, res) => {
     const guestId = req.claims.payload.guestId;
     const gameId = req.params.gameId;
@@ -64,7 +83,7 @@ router.post('/answer/:gameId', securityUtils.authenticateToken, (req, res) => {
     } else {
         // post to answers services
         // notify 
-        var responseObject = {
+        let responseObject = {
             operation: 'answer-received',
             answer: answerData
         }
@@ -84,12 +103,12 @@ router.get('/evaluate-answers/:gameId', securityUtils.authenticateToken, (req, r
 });
 
 router.ws('/evaluate-answers/ws/:gameId', function (ws, req) {
-    
+
     answersRoom[req.params.gameId] = answersRoom[req.params.gameId] || [];
     answersRoom[req.params.gameId].push(ws);
 
-    ws.on('close', function() {
-        var index = answersRoom[req.params.gameId].indexOf(ws);
+    ws.on('close', function () {
+        let index = answersRoom[req.params.gameId].indexOf(ws);
         if (index != -1) {
             answersRoom[req.params.gameId].splice(index, 1);
             if (answersRoom[req.params.gameId].length == 0) {
@@ -109,7 +128,7 @@ router.post('/', securityUtils.authenticateToken, (req, res) => {
             if (result === null) {
                 res.status(500).send("Internal Server Error");
             } else {
-                var responseObject = {
+                let responseObject = {
                     operation: 'start-game',
                     gameId: result.id
                 }
