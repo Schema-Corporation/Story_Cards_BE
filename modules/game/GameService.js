@@ -48,8 +48,7 @@ module.exports = {
                             flag = true;
                             return response(deleteResult);
                         });
-                    }
-                    if (array.length - 1 === index && !flag) {
+                    } else if (array.length - 1 === index && !flag) {
                         console.log("Could not find any challenge with given Id!");
                         return response(null);
                     }
