@@ -29,11 +29,11 @@ router.ws('/challenges-approval/ws/:guestId', function (ws, req) {
     challengesApprovalGuestRoom[req.params.guestId].push(ws);
 
     ws.on('close', function () {
-        let index = challengesApprovalGuestRoom[req.params.roomId].indexOf(ws);
+        let index = challengesApprovalGuestRoom[req.params.guestId].indexOf(ws);
         if (index !== -1) {
-            challengesApprovalGuestRoom[req.params.roomId].splice(index, 1);
-            if (challengesApprovalGuestRoom[req.params.roomId].length === 0) {
-                challengesApprovalGuestRoom[req.params.roomId] = null;
+            challengesApprovalGuestRoom[req.params.guestId].splice(index, 1);
+            if (challengesApprovalGuestRoom[req.params.guestId].length === 0) {
+                challengesApprovalGuestRoom[req.params.guestId] = null;
             }
         }
     });
@@ -54,12 +54,22 @@ router.ws('/game-waiting-room/ws/:roomId', function (ws, req) {
         }
     });
 });
-router.post('/add-challenge', securityUtils.authenticateToken, (req, res) => {
+router.post('/add-challenge/:gameId', securityUtils.authenticateToken, (req, res) => {
     const requestBody = req.body;
+    const gameId = req.params.gameId;
     if (Object.keys(req.body).length === 0) {
         res.status(422).send({"error": "Body cannot be null!"});
     } else {
         gameService.addChallengeToGame(requestBody, function (result) {
+            let responseObject = {
+                operation: 'challenge-received',
+                challenge: requestBody
+            }
+            if (challengesHostGuestRoom[gameId] != null && challengesHostGuestRoom[gameId].length > 0) {
+                challengesHostGuestRoom[gameId].forEach(client => {
+                    client.send(JSON.stringify(responseObject));
+                });
+            }
             res.status(201);
             res.send({"challengesOnList": result});
         });
@@ -84,7 +94,15 @@ router.put('/challenges/:gameId', securityUtils.authenticateToken, (req, res) =>
     } else if (Object.keys(req.body).length === 0) {
         res.status(422).send({"error": "Body cannot be null!"});
     } else {
-        gameService.editChallengeStatus(gameId, requestBody.guestId, requestBody.status, function (result) {
+        gameService.editChallengeStatus(gameId, requestBody.guestId, requestBody.status, requestBody.points, function (result) {
+            let responseObject = {
+                operation: 'challenge-approved'
+            }
+            if (challengesApprovalGuestRoom[requestBody.guestId] != null && challengesApprovalGuestRoom[requestBody.guestId].length > 0) {
+                challengesApprovalGuestRoom[requestBody.guestId].forEach(client => {
+                    client.send(JSON.stringify(responseObject));
+                });
+            }
             res.status(200);
             res.send(result);
         });

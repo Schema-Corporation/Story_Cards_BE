@@ -13,20 +13,22 @@ module.exports = {
             "guestId": challengeRequest.guestId,
             "fullName": challengeRequest.fullName,
             "challengeBody": challengeRequest.challengeBody,
-            "status": 0
+            "status": 0,
+            "points": 0
         }));
         insertDataIntoRedisList(auxList, response);
     },
     getChallengesFromWaitingRoom: function (gameId, callback) {
         getRedisList(gameId, callback);
     },
-    editChallengeStatus: function (gameId, guestId, status, callback) {
+    editChallengeStatus: function (gameId, guestId, status, points, callback) {
         getRedisList(gameId, function (result) {
             result.forEach(challenge => {
                 console.log(challenge);
                 if (challenge.guestId === guestId) {
                     getPositionFromRedisList(gameId, JSON.stringify(challenge), function (findResult) {
                         challenge.status = status;
+                        challenge.points = points;
                         editItemInRedisList(gameId, findResult, JSON.stringify(challenge), callback);
                     });
                 }

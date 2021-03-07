@@ -135,7 +135,8 @@ router.ws('/guests/ws/:roomId', function (ws, req) {
     });
 });
 
-router.get('/guests/:roomId', function (req, res) {
+router.get('/guests/:roomId', securityUtils.authenticateToken, function (req, res) {
+    const userId = req.claims.payload.user.userId;
     const params = req.params;
     const roomId = params.roomId;
     guestService.getRoomGuests(roomId, function (result) {
