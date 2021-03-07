@@ -11,8 +11,8 @@ module.exports = {
             "guestId": challengeRequest.guestId,
             "fullName": challengeRequest.fullName,
             "challengeBody": challengeRequest.challengeBody,
-            "status": 0,
-            "points": 0
+            "status": challengeRequest.status,
+            "points": challengeRequest.points
         }));
         redisOperations.insertDataIntoRedisList(auxList, response);
     },

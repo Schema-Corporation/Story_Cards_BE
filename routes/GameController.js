@@ -108,7 +108,7 @@ router.put('/challenges/:gameId', securityUtils.authenticateToken, (req, res) =>
         });
     }
 });
-router.delete('/challenges/:gameId/:guestId', securityUtils.authenticateToken, (req, res) => {
+router.delete('/challenges/:gameId/guest/:guestId', securityUtils.authenticateToken, (req, res) => {
     const gameId = req.params.gameId;
     const guestId = req.params.guestId;
     if (gameId === null || gameId === undefined) {
