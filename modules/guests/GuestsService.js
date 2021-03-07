@@ -1,73 +1,76 @@
 const guestRepository = require('../repository/GuestRepository')
 const redis = require('../config/RedisConfig')
 const securityUtils = require('../utils/SecurityUtil');
-
+const redisOperations = require('../utils/RedisUtil');
 module.exports = {
     addGuestToRoom: function (request, response) {
         guestRepository.createGuest(request, function (result) {
             let auxList = [];
             auxList.push(request.roomId);
             auxList.push(JSON.stringify(result));
-            insertRedisList(auxList);
-            return response({
-                "token": securityUtils.generateAccessToken({
-                    "roomId": result.roomId,
-                    "guestId": result.id
-                }),
-                "guestData": result
+            redisOperations.insertDataIntoRedisList(auxList, function (redisResult) {
+                console.log(redisResult);
+                return response({
+                    "token": securityUtils.generateAccessToken({
+                        "roomId": result.roomId,
+                        "guestId": result.id
+                    }),
+                    "guestData": result
+                });
             });
         });
     },
     removeGuest: function (roomId, guestId, response) {
         guestRepository.removeGuest(guestId, function (result) {
-            getRedisListIfExists(roomId, function (result) {
-                result.forEach(guest => {
+            redisOperations.getRedisList(roomId, function (searchResult) {
+                if (searchResult === []) {
+                    console.log("Could not find redis list with given key or list is empty");
+                    return;
+                }
+                searchResult.forEach(guest => {
                     if (guest.id === guestId) {
-                        removeItemFromRedisList(roomId, JSON.stringify(guest));
+                        redisOperations.removeItemFromRedisList(roomId, JSON.stringify(guest), function (deleteResult) {
+                            console.log("Deleted guest from redis list in index" + deleteResult);
+                            return response(result);
+                        });
                     }
                 })
-            })
-            return response(result);
+            });
         });
     },
     getRoomGuests: function (roomId, response) {
-        getRedisListIfExists(roomId, response);
+        redisOperations.getRedisList(roomId, function (searchResult) {
+            if (searchResult.length === 0) {
+                console.log("Could not find any result on redis and therefore the list is obtained from db");
+                guestRepository.getRoomGuests(roomId, function (dbResult) {
+                    dbResult.forEach(guest => {
+                        let auxList = [];
+                        auxList.push(roomId);
+                        auxList.push(JSON.stringify(guest));
+                        redisOperations.insertDataIntoRedisList(auxList, function (insertRedisResult) {
+                            console.log("Redis Insert operation ended with result:", insertRedisResult);
+                            return response(dbResult);
+                        });
+                    })
+                });
+            } else {
+                return response(searchResult);
+            }
+        });
     },
-    updateGuest: function (guestId, status, response) {
+    updateGuest: function (roomId, guestId, status, response) {
         guestRepository.updateGuest(guestId, status, function (result) {
-            // update guest in list of guests in redis
-            return response(result);
+            redisOperations.getRedisList(roomId, function (searchResult) {
+                searchResult.forEach(guest => {
+                    console.log(guest);
+                    if (guest.id === guestId) {
+                        redisOperations.getPositionFromRedisList(roomId, JSON.stringify(guest), function (findResult) {
+                            guest.status = status;
+                            redisOperations.editItemInRedisList(roomId, findResult, JSON.stringify(guest), response);
+                        });
+                    }
+                })
+            })
         });
     }
-}
-
-function getRedisListIfExists(key, response) {
-    redis.getRedisClient().lrange(key, 0, -1, function (err, reply) {
-        if (err) {
-            guestRepository.getRoomGuests(key, response);
-            console.log(err);
-        }
-        if (reply === undefined || reply === null || reply.length < 1) {
-            guestRepository.getRoomGuests(key, response);
-        }
-        console.log(reply);
-        let parsedReply = new Array(0);
-        reply.forEach(rawReply => parsedReply.push(JSON.parse(rawReply)));
-        return response(parsedReply);
-    });
-}
-
-function removeItemFromRedisList(key, elementToRemove) {
-    redis.getRedisClient().lrem(key, 0, elementToRemove, function (err, data) {
-        console.log(data);
-    });
-}
-
-function insertRedisList(list) {
-    redis.getRedisClient().rpush(list, function (err, reply) {
-        if (err) {
-            console.log(err);
-        }
-        console.log(reply);
-    })
 }

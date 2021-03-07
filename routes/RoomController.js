@@ -55,7 +55,7 @@ router.delete('/remove-guest/:guestId/:roomId', securityUtils.authenticateToken,
     if (guestId === null || guestId === undefined) {
         res.status(422).send({"error": "Guest Id is required!"})
     } else {
-        guestService.removeGuest(guestId, function (result) {
+        guestService.removeGuest(roomId, guestId, function (result) {
             if (result === null) {
                 res.status(500).send("Internal Server Error");
             } else if (result.error != null) {
@@ -88,7 +88,7 @@ router.delete('/remove-guest', securityUtils.authenticateToken, (req, res) => {
             } else if (result.error != null) {
                 res.status(422).send(result);
             } else {
-                var responseObject = {
+                let responseObject = {
                     operation: 'remove-guest',
                     guestId: guestId
                 }
@@ -152,7 +152,7 @@ router.put('/guests/', securityUtils.authenticateToken, function (req, res) {
     const guestId = req.claims.payload.guestId;
     const roomId = req.claims.payload.roomId;
     const status = req.body.status;
-    guestService.updateGuest(guestId, status, function (result) {
+    guestService.updateGuest(roomId, guestId, status, function (result) {
         if (result === null || result === undefined) {
             res.status(200).send({"guests": []});
         } else {

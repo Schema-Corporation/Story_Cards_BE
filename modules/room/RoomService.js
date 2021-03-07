@@ -1,6 +1,5 @@
 const roomRepository = require('../repository/RoomRepository.js');
 const errorUtils = require('../utils/ErrorConstants');
-const securityUtils = require('../utils/SecurityUtil');
 module.exports = {
     getRooms: function (userId, response) {
         roomRepository.getRoomsByUserId(userId, function (searchResult) {

@@ -10,15 +10,17 @@ module.exports = {
         if (token == null) {
             console.log("Token is null")
             res.sendStatus(401)
+        } else {
+            jwt.verify(token, process.env.ACCESS_TOKEN_SECRET.toString(), (err, claims) => {
+                if (err) {
+                    console.log(err);
+                    res.sendStatus(403)
+                } else {
+                    req.claims = claims
+                    next()
+                }
+            })
         }
-        jwt.verify(token, process.env.ACCESS_TOKEN_SECRET.toString(), (err, claims) => {
-            if (err) {
-                console.log(err);
-                res.sendStatus(403)
-            }
-            req.claims = claims
-            next()
-        })
     },
     hashPassword: function (password, callback) {
         bcrypt.hash(password, saltRounds, (err, hash) => {
