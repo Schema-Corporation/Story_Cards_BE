@@ -32,5 +32,29 @@ module.exports = {
                 }
             })
         })
+    },
+    deleteChallenge: function (gameId, guestId, response) {
+        redisOperations.getRedisList(gameId, function (searchResult) {
+            console.log(searchResult);
+            if (searchResult.length === 0) {
+                console.log("Could not find redis list with given key or list is empty");
+                return response(undefined);
+            } else {
+                let flag = false;
+                searchResult.forEach(function (challenge, index, array) {
+                    if (challenge.guestId === guestId) {
+                        redisOperations.removeItemFromRedisList(gameId, JSON.stringify(challenge), function (deleteResult) {
+                            console.log("Deleted guest from redis list in index: " + deleteResult);
+                            flag = true;
+                            return response(deleteResult);
+                        });
+                    }
+                    if (array.length - 1 === index && !flag) {
+                        console.log("Could not find any challenge with given Id!");
+                        return response(null);
+                    }
+                })
+            }
+        });
     }
 }

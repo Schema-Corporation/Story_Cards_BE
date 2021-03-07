@@ -108,6 +108,26 @@ router.put('/challenges/:gameId', securityUtils.authenticateToken, (req, res) =>
         });
     }
 });
+router.delete('/challenges/:gameId/:guestId', securityUtils.authenticateToken, (req, res) => {
+    const gameId = req.params.gameId;
+    const guestId = req.params.guestId;
+    if (gameId === null || gameId === undefined) {
+        res.status(422).send({"error": "Game Id must not be null"});
+    } else {
+        gameService.deleteChallenge(gameId, guestId, function (result) {
+            if (result === null) {
+                res.status(422);
+                res.send({"error": "Could not find any challenge with given guest ID!"});
+            } else if (result === undefined) {
+                res.status(422);
+                res.send({"error": "Redis List is empty for the given key!"})
+            } else {
+                res.status(200);
+                res.send({"operationResult": result});
+            }
+        });
+    }
+});
 router.post('/answer/:gameId', securityUtils.authenticateToken, (req, res) => {
     const guestId = req.claims.payload.guestId;
     const gameId = req.params.gameId;
@@ -135,7 +155,6 @@ router.get('/evaluate-answers/:gameId', securityUtils.authenticateToken, (req, r
     const gameId = req.params.gameId;
     res.status(200).send([]);
 });
-
 router.ws('/evaluate-answers/ws/:gameId', function (ws, req) {
 
     answersRoom[req.params.gameId] = answersRoom[req.params.gameId] || [];
