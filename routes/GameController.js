@@ -5,6 +5,7 @@ const gameService = require('../modules/game/GameService');
 const errorUtils = require('../modules/utils/ErrorConstants');
 
 let guestWaitingRoom = {};
+let guestWaitingGame = {};
 let challengesApprovalGuestRoom = {};
 let challengesHostGuestRoom = {};
 let answersRoom = {};
@@ -39,6 +40,37 @@ router.ws('/challenges-approval/ws/:guestId', function (ws, req) {
     });
 });
 
+router.ws('/game-waiting-game/ws/:gameId', function (ws, req) {
+
+    guestWaitingGame[req.params.gameId] = guestWaitingGame[req.params.gameId] || [];
+    guestWaitingGame[req.params.gameId].push(ws);
+
+    ws.on('close', function () {
+        let index = guestWaitingGame[req.params.gameId].indexOf(ws);
+        if (index !== -1) {
+            guestWaitingGame[req.params.gameId].splice(index, 1);
+            if (guestWaitingGame[req.params.gameId].length === 0) {
+                guestWaitingGame[req.params.gameId] = null;
+            }
+        }
+    });
+});
+
+router.post('/start-game/:gameId', securityUtils.authenticateToken, (req, res) => {
+    const userId = req.claims.payload.user.userId;
+    const gameId = req.params.gameId;
+    let responseObject = {
+        operation: 'go-start',
+        gameId: gameId
+    }
+    if (guestWaitingGame[gameId] != null && guestWaitingGame[gameId].length > 0) {
+        guestWaitingGame[gameId].forEach(client => {
+            client.send(JSON.stringify(responseObject));
+        });
+    }
+    res.status(201).send(true);
+});
+
 router.ws('/game-waiting-room/ws/:roomId', function (ws, req) {
 
     guestWaitingRoom[req.params.roomId] = guestWaitingRoom[req.params.roomId] || [];
@@ -54,6 +86,7 @@ router.ws('/game-waiting-room/ws/:roomId', function (ws, req) {
         }
     });
 });
+
 router.post('/add-challenge/:gameId', securityUtils.authenticateToken, (req, res) => {
     const requestBody = req.body;
     const gameId = req.params.gameId;
