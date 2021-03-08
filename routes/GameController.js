@@ -155,6 +155,14 @@ router.delete('/challenges/:gameId/guest/:guestId', securityUtils.authenticateTo
                 res.status(422);
                 res.send({"error": "Redis List is empty for the given key!"})
             } else {
+                let responseObject = {
+                    operation: 'challenge-rejected'
+                }
+                if (challengesApprovalGuestRoom[guestId] != null && challengesApprovalGuestRoom[guestId].length > 0) {
+                    challengesApprovalGuestRoom[guestId].forEach(client => {
+                        client.send(JSON.stringify(responseObject));
+                    });
+                }
                 res.status(200);
                 res.send({"operationResult": result});
             }
