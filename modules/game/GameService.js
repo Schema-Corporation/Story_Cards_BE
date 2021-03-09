@@ -69,7 +69,8 @@ module.exports = {
             "competency": requestBody.competency,
             "fullName": requestBody.fullName,
             "scoreObtained": requestBody.scoreObtained,
-            "challengeDifficulty": requestBody.challengeDifficulty
+            "challengeDifficulty": requestBody.challengeDifficulty,
+            "extraPoints": requestBody.extraPoints
         }));
         redisOperations.insertDataIntoRedisList(auxList, callback);
     },
