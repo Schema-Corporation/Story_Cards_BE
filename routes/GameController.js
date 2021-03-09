@@ -6,6 +6,7 @@ const errorUtils = require('../modules/utils/ErrorConstants');
 
 let guestWaitingRoom = {};
 let guestWaitingGame = {};
+let guestWaitingScores = {};
 let challengesApprovalGuestRoom = {};
 let challengesHostGuestRoom = {};
 let answersRoom = {};
@@ -82,6 +83,37 @@ router.ws('/game-waiting-room/ws/:roomId', function (ws, req) {
             guestWaitingRoom[req.params.roomId].splice(index, 1);
             if (guestWaitingRoom[req.params.roomId].length === 0) {
                 guestWaitingRoom[req.params.roomId] = null;
+            }
+        }
+    });
+});
+
+router.post('/finish-game/:gameId', securityUtils.authenticateToken, (req, res) => {
+    const userId = req.claims.payload.user.userId;
+    const gameId = req.params.gameId;
+    let responseObject = {
+        operation: 'go-finish',
+        gameId: gameId
+    }
+    if (guestWaitingScores[gameId] != null && guestWaitingScores[gameId].length > 0) {
+        guestWaitingScores[gameId].forEach(client => {
+            client.send(JSON.stringify(responseObject));
+        });
+    }
+    res.status(201).send(true);
+});
+
+router.ws('/game-waiting-scores/ws/:roomId', function (ws, req) {
+
+    guestWaitingScores[req.params.roomId] = guestWaitingScores[req.params.roomId] || [];
+    guestWaitingScores[req.params.roomId].push(ws);
+
+    ws.on('close', function () {
+        let index = guestWaitingScores[req.params.roomId].indexOf(ws);
+        if (index !== -1) {
+            guestWaitingScores[req.params.roomId].splice(index, 1);
+            if (guestWaitingScores[req.params.roomId].length === 0) {
+                guestWaitingScores[req.params.roomId] = null;
             }
         }
     });
