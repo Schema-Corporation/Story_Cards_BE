@@ -10,7 +10,7 @@ module.exports = {
         let auxList = [];
         auxList.push(challengeRequest.gameId);
         auxList.push(JSON.stringify({
-            "challengeId":uuid.v4(),
+            "challengeId": uuid.v4(),
             "guestId": challengeRequest.guestId,
             "fullName": challengeRequest.fullName,
             "challengeBody": challengeRequest.challengeBody,
@@ -56,6 +56,38 @@ module.exports = {
                         return response(null);
                     }
                 })
+            }
+        });
+    },
+    addAnswerToChallenge: function (challengeId, requestBody, callback) {
+        let auxList = [];
+        auxList.push(challengeId);
+        auxList.push(JSON.stringify({
+            "challengeId": challengeId,
+            "guestId": requestBody.guestId,
+            "answerText": requestBody.answerText,
+            "competency": requestBody.competency,
+            "scoreObtained": requestBody.scoreObtained,
+            "challengeDifficulty": requestBody.challengeDifficulty
+        }));
+        redisOperations.insertDataIntoRedisList(auxList, callback);
+    },
+    getAnswersForChallenge: function (gameId, callback) {
+        let resultList = Array(0);
+        module.exports.getChallengesFromWaitingRoom(gameId, function (searchResult) {
+            if (searchResult.length === 0) {
+                return callback([]);
+            } else {
+                searchResult.forEach(function (challenge, index, array) {
+                    redisOperations.getRedisList(challenge.challengeId, function (challengeAnswers) {
+                        if (challengeAnswers.length !== 0) {
+                            resultList.push.apply(resultList, challengeAnswers);
+                        }
+                        if (index === array.length - 1) {
+                            return callback(resultList);
+                        }
+                    });
+                });
             }
         });
     }

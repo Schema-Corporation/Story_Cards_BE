@@ -204,29 +204,36 @@ router.delete('/challenges/:gameId/guest/:guestId', securityUtils.authenticateTo
 router.post('/answer/:gameId', securityUtils.authenticateToken, (req, res) => {
     const guestId = req.claims.payload.guestId;
     const gameId = req.params.gameId;
-    const answerData = req.body.answerData;
+    const answerData = req.body;
     if (Object.keys(req.body).length === 0) {
         res.status(422).send({"error": "Body cannot be null!"});
     } else {
-        // post to answers services
-        // notify 
-        let responseObject = {
-            operation: 'answer-received',
-            answer: answerData
-        }
-        if (answersRoom[gameId] != null && answersRoom[gameId].length > 0) {
-            answersRoom[gameId].forEach(client => {
-                client.send(JSON.stringify(responseObject));
-            });
-        }
-        res.status(204).send();
+        gameService.addAnswerToChallenge(answerData.challengeId, answerData, function (insertResult) {
+            if (insertResult === undefined || insertResult === null) {
+                res.status(500);
+                res.send({"error": "Something wrong happened during the insert operation!"});
+            } else {
+                let responseObject = {
+                    operation: 'answer-received',
+                    answer: answerData
+                }
+                if (answersRoom[gameId] != null && answersRoom[gameId].length > 0) {
+                    answersRoom[gameId].forEach(client => {
+                        client.send(JSON.stringify(responseObject));
+                    });
+                }
+                res.status(204).send();
+            }
+        });
     }
 });
 
 router.get('/evaluate-answers/:gameId', securityUtils.authenticateToken, (req, res) => {
     const userId = req.claims.payload.user.userId;
     const gameId = req.params.gameId;
-    res.status(200).send([]);
+    gameService.getAnswersForChallenge(gameId, function (result) {
+        res.status(200).send(result);
+    });
 });
 router.ws('/evaluate-answers/ws/:gameId', function (ws, req) {
 
@@ -235,9 +242,9 @@ router.ws('/evaluate-answers/ws/:gameId', function (ws, req) {
 
     ws.on('close', function () {
         let index = answersRoom[req.params.gameId].indexOf(ws);
-        if (index != -1) {
+        if (index !== -1) {
             answersRoom[req.params.gameId].splice(index, 1);
-            if (answersRoom[req.params.gameId].length == 0) {
+            if (answersRoom[req.params.gameId].length === 0) {
                 answersRoom[req.params.gameId] = null;
             }
         }
