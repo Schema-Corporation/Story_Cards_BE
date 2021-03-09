@@ -67,6 +67,7 @@ module.exports = {
             "guestId": requestBody.guestId,
             "answerText": requestBody.answerText,
             "competency": requestBody.competency,
+            "fullName": requestBody.fullName,
             "scoreObtained": requestBody.scoreObtained,
             "challengeDifficulty": requestBody.challengeDifficulty
         }));
