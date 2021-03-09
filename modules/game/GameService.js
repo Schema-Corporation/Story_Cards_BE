@@ -1,5 +1,7 @@
 const gameRepository = require('../repository/GameRepository')
 const redisOperations = require('../utils/RedisUtil');
+const uuid = require('uuid');
+
 module.exports = {
     createGame: function (userId, gameObject, response) {
         gameRepository.createGame(userId, gameObject, response);
@@ -8,6 +10,7 @@ module.exports = {
         let auxList = [];
         auxList.push(challengeRequest.gameId);
         auxList.push(JSON.stringify({
+            "challengeId":uuid.v4(),
             "guestId": challengeRequest.guestId,
             "fullName": challengeRequest.fullName,
             "challengeBody": challengeRequest.challengeBody,
