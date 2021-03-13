@@ -235,6 +235,26 @@ router.get('/evaluate-answers/:gameId', securityUtils.authenticateToken, (req, r
         res.status(200).send(result);
     });
 });
+router.put('/modify-answers/:challengeId/answer/:answerId', securityUtils.authenticateToken, (req, res) => {
+    const answerId = req.params.answerId;
+    const challengeId = req.params.challengeId;
+    const reqBody = req.body;
+    if (answerId === undefined || answerId === null) {
+        res.status(422).send({"error": "AnswerId cannot be null!"});
+    } else if (challengeId === undefined || challengeId === null) {
+        res.status(422).send({"error": "ChallengeId cannot be null!"});
+    } else if (Object.keys(req.body).length === 0) {
+        res.status(422).send({"error": "Request Body cannot be null!"});
+    } else {
+        gameService.editAnswer(challengeId, answerId, reqBody.extraPoints, reqBody.evaluated, function (result) {
+            if (result === undefined || result === null) {
+                res.status(500).send({"error": "Could not edit answer!"});
+            } else {
+                res.status(200).send(result);
+            }
+        });
+    }
+});
 router.ws('/evaluate-answers/ws/:gameId', function (ws, req) {
 
     answersRoom[req.params.gameId] = answersRoom[req.params.gameId] || [];

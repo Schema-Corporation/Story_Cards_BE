@@ -63,6 +63,7 @@ module.exports = {
         let auxList = [];
         auxList.push(challengeId);
         auxList.push(JSON.stringify({
+            "answerId": uuid.v4(),
             "challengeId": challengeId,
             "guestId": requestBody.guestId,
             "answerText": requestBody.answerText,
@@ -70,7 +71,8 @@ module.exports = {
             "fullName": requestBody.fullName,
             "scoreObtained": requestBody.scoreObtained,
             "challengeDifficulty": requestBody.challengeDifficulty,
-            "extraPoints": requestBody.extraPoints
+            "extraPoints": requestBody.extraPoints,
+            "evaluated": false
         }));
         redisOperations.insertDataIntoRedisList(auxList, callback);
     },
@@ -92,5 +94,18 @@ module.exports = {
                 });
             }
         });
+    },
+    editAnswer: function (challengeId, answerId, extraPoints, evaluated, callback) {
+        redisOperations.getRedisList(challengeId, function (searchResult) {
+            searchResult.forEach(answer => {
+                if (answer.answerId === answerId) {
+                    redisOperations.getPositionFromRedisList(challengeId, JSON.stringify(answer), function (findResult) {
+                        answer.extraPoints = extraPoints;
+                        answer.evaluated = evaluated;
+                        redisOperations.editItemInRedisList(challengeId, findResult, JSON.stringify(answer), callback);
+                    });
+                }
+            })
+        })
     }
 }
