@@ -137,8 +137,7 @@ router.ws('/notify-finish-game/ws/:gameId', function (ws, req) {
     });
 });
 
-router.post('/end-game/:gameId', securityUtils.authenticateToken, function (req, res) {
-    const userId = req.claims.payload.user.userId;
+router.post('/end-game/:gameId', function (req, res) {
     const gameId = req.params.gameId;
     let responseObject = {
         operation: 'end-game',
@@ -261,6 +260,36 @@ router.post('/answer/:gameId', securityUtils.authenticateToken, (req, res) => {
     }
 });
 
+router.get('/scores/:gameId', securityUtils.authenticateToken, (req, res) => {
+    const gameId = req.params.gameId;
+    const result = [{
+        name: 'Juan Perez',
+        score: 27,
+        extraPoints: 2,
+        finalScore: 29
+      },
+      {
+        name: 'Jorge Perez',
+        score: 26,
+        extraPoints: -2,
+        finalScore: 24
+      },
+      {
+        name: 'Carlos Perez',
+        score: 25,
+        extraPoints: -10,
+        finalScore: 15
+      },
+      {
+        name: 'Pedro Perez',
+        score: 10,
+        extraPoints: -10,
+        finalScore: 0
+      }];
+    res.status(200).send(result);
+});
+
+
 router.get('/evaluate-answers/:gameId', securityUtils.authenticateToken, (req, res) => {
     const userId = req.claims.payload.user.userId;
     const gameId = req.params.gameId;
@@ -268,6 +297,7 @@ router.get('/evaluate-answers/:gameId', securityUtils.authenticateToken, (req, r
         res.status(200).send(result);
     });
 });
+
 router.put('/modify-answers/:challengeId/answer/:answerId', securityUtils.authenticateToken, (req, res) => {
     const answerId = req.params.answerId;
     const challengeId = req.params.challengeId;

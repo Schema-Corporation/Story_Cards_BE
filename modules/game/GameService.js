@@ -63,7 +63,7 @@ module.exports = {
         let auxList = [];
         auxList.push(challengeId);
         auxList.push(JSON.stringify({
-            "answerId": uuid.v4(),
+            "answerId": requestBody.answerId,
             "challengeId": challengeId,
             "guestId": requestBody.guestId,
             "answerText": requestBody.answerText,
