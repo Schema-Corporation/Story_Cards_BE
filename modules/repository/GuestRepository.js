@@ -74,5 +74,15 @@ module.exports = {
             }
         });
         databaseConfig.closeConnection();
+    },
+    removeGuestsFromRoom: function (roomId, callback) {
+        databaseConfig.getSession().query('DELETE FROM guest g where g.room_id = ?', roomId, (err, result) => {
+            if (err) {
+                console.log(err);
+                return callback(null);
+            }
+            return callback(roomId);
+        });
+        databaseConfig.closeConnection();
     }
 }

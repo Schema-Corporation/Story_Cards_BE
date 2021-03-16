@@ -36,5 +36,15 @@ module.exports = {
             })
         });
         databaseConfig.closeConnection();
+    },
+    deleteGameByRoomId(roomId, callback) {
+        databaseConfig.getSession().query('DELETE FROM game g where g.room_id = ?', roomId, (err, result) => {
+            if (err) {
+                console.log(err);
+                return callback(null);
+            }
+            return callback(result);
+        });
+        databaseConfig.closeConnection();
     }
 }

@@ -1,4 +1,6 @@
 const roomRepository = require('../repository/RoomRepository.js');
+const gameRepository = require('../repository/GameRepository.js');
+const guestRepository = require('../repository/GuestRepository');
 const errorUtils = require('../utils/ErrorConstants');
 module.exports = {
     getRooms: function (userId, response) {
@@ -48,7 +50,11 @@ module.exports = {
             } else if (result.userId !== userId) {
                 return response({"error": errorUtils.ROOM_DOES_NOT_BELONG})
             } else {
-                roomRepository.deleteRoomForUser(roomId, response);
+                gameRepository.deleteGameByRoomId(roomId, function (games) {
+                    guestRepository.removeGuestsFromRoom(roomId, function (guests) {
+                        roomRepository.deleteRoomForUser(roomId, response);
+                    });
+                });
             }
         });
     },
