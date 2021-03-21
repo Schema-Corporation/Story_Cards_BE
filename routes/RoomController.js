@@ -119,6 +119,23 @@ router.post('/validate-code', (req, res) => {
     }
 });
 
+router.post('/validate-room-entering/', securityUtils.authenticateToken,  (req, res) => {
+    const roomId = req.claims.payload.roomId;
+    roomService.validateNumberOfParticipantsInGame(roomId, function (result) {
+        if (result === null) {
+            res.status(500).send("Internal Server Error");
+        } else if (result.error !== undefined) {
+            res.status(422).send({"error": result.error});
+        } else {
+            var allowParticipant = false;
+            if (result.active_guests < 6) {
+                allowParticipant = true;
+            }
+            res.status(200).send(allowParticipant);
+        }
+    });
+});
+
 router.ws('/guests/ws/:roomId', function (ws, req) {
 
     guestListClients[req.params.roomId] = guestListClients[req.params.roomId] || [];

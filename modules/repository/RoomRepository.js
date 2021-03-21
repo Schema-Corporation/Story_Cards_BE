@@ -25,6 +25,22 @@ module.exports = {
         });
         databaseConfig.closeConnection();
     },
+    validateNumberOfParticipantsInGame: function (roomId, callback) {
+        databaseConfig.getSession().query("SELECT COUNT(*) as 'active_guests' from guest where room_id = ? and status = 2", roomId, (err, result) => {
+            if (err) {
+                console.log(err);
+                return callback(null);
+            }
+            let rawResult = result[0];
+            if (rawResult === undefined) {
+                return callback(rawResult);
+            }
+            return callback({
+                active_guests: rawResult.active_guests,
+            })
+        });
+        databaseConfig.closeConnection();
+    },
     getRoomByRoomId: function (roomId, callback) {
         databaseConfig.getSession().query('SELECT id,user_id,room_name,max_guests,room_code,enabled FROM room r WHERE r.id = ? ORDER BY created_date desc', roomId, (err, result) => {
             parseSingleResult(err, result, callback);

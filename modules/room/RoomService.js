@@ -17,6 +17,16 @@ module.exports = {
             }
         );
     },
+    validateNumberOfParticipantsInGame: function (roomId, response) {
+        roomRepository.validateNumberOfParticipantsInGame(roomId, function (result) {
+            if (result === undefined) {
+                return response({"error": errorUtils.NO_ROOM_FOUND})
+            } else {
+                return response(result);
+            }
+        }
+    );
+    },
     getRoomById: function (userId, roomId, response) {
         roomRepository.getRoomByRoomId(roomId, function (result) {
                 if (result === undefined) {
