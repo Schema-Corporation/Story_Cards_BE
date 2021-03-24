@@ -262,31 +262,9 @@ router.post('/answer/:gameId', securityUtils.authenticateToken, (req, res) => {
 
 router.get('/scores/:gameId', securityUtils.authenticateToken, (req, res) => {
     const gameId = req.params.gameId;
-    const result = [{
-        name: 'Juan Perez',
-        score: 27,
-        extraPoints: 2,
-        finalScore: 29
-      },
-      {
-        name: 'Jorge Perez',
-        score: 26,
-        extraPoints: -2,
-        finalScore: 24
-      },
-      {
-        name: 'Carlos Perez',
-        score: 25,
-        extraPoints: -10,
-        finalScore: 15
-      },
-      {
-        name: 'Pedro Perez',
-        score: 10,
-        extraPoints: -10,
-        finalScore: 0
-      }];
-    res.status(200).send(result);
+    gameService.getAnswersForChallenge(gameId, function (result) {
+        res.status(200).send(result);
+    });
 });
 
 
