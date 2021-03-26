@@ -205,9 +205,10 @@ router.put('/challenges/:gameId', securityUtils.authenticateToken, (req, res) =>
         });
     }
 });
-router.delete('/challenges/:gameId/guest/:guestId', securityUtils.authenticateToken, (req, res) => {
+router.post('/challenges-reject/:gameId/guest/:guestId', securityUtils.authenticateToken, (req, res) => {
     const gameId = req.params.gameId;
     const guestId = req.params.guestId;
+    const requestBody = req.body;
     if (gameId === null || gameId === undefined) {
         res.status(422).send({"error": "Game Id must not be null"});
     } else {
@@ -220,7 +221,8 @@ router.delete('/challenges/:gameId/guest/:guestId', securityUtils.authenticateTo
                 res.send({"error": "Redis List is empty for the given key!"})
             } else {
                 let responseObject = {
-                    operation: 'challenge-rejected'
+                    operation: 'challenge-rejected',
+                    reason: requestBody.reason
                 }
                 if (challengesApprovalGuestRoom[guestId] != null && challengesApprovalGuestRoom[guestId].length > 0) {
                     challengesApprovalGuestRoom[guestId].forEach(client => {
