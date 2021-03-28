@@ -2,7 +2,7 @@ const express = require('express')
 const app = express()
 const cors = require('cors')
 const createError = require('http-errors');
-//require('./modules/config/CorsConfiguration');
+require('./modules/config/CorsConfiguration');
 const port = normalizePort(process.env.PORT || '3000');
 const bodyParser = require('body-parser');
 const path = require('path');
