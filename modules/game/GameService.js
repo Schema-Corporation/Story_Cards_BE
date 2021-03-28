@@ -107,5 +107,10 @@ module.exports = {
                 }
             })
         })
+    },
+    calculateScores: function (gameId, callback) {
+        redisOperations.getRedisList(gameId, function (resultSearch) {
+
+        });
     }
 }
