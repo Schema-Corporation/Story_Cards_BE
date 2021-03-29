@@ -36,7 +36,7 @@ app.get('/', (req, res) => {
         healthCheckUtils.pingRedisServer(function (result) {
             res.status(200).send({
                 "Redis": result,
-                "Database": "UP"
+                "MySQL": "UP"
             })
         });
     } else {
