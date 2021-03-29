@@ -3,4 +3,13 @@ extends layout
 block content
     h1= title
     p #{message}
-
+    p Backend service status is detailed bellow:
+    table
+        tr
+            th Service Name
+            th Status
+        tbody
+            each service in serviceList
+                tr
+                    td=service.name
+                    td=service.status
