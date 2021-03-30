@@ -119,7 +119,7 @@ router.post('/validate-code', (req, res) => {
     }
 });
 
-router.post('/validate-room-entering/', securityUtils.authenticateToken,  (req, res) => {
+router.post('/validate-room-entering/', securityUtils.authenticateToken, (req, res) => {
     const roomId = req.claims.payload.roomId;
     roomService.validateNumberOfParticipantsInGame(roomId, function (result) {
         if (result === null) {
@@ -169,6 +169,7 @@ router.put('/guests/', securityUtils.authenticateToken, function (req, res) {
     const guestId = req.claims.payload.guestId;
     const roomId = req.claims.payload.roomId;
     const status = req.body.status;
+    console.log({"guestId": guestId, "roomId": roomId, "status": status});
     guestService.updateGuest(roomId, guestId, status, function (result) {
         if (result === null || result === undefined) {
             res.status(200).send({"guests": []});
