@@ -13,6 +13,7 @@ const canvasController = require('./routes/CanvasController');
 const roomController = require('./routes/RoomController');
 const gameController = require('./routes/GameController');
 const registrationController = require('./routes/RegistrationController');
+const healthCheckUtils = require('./modules/utils/HealthCheck');
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
@@ -30,7 +31,29 @@ app.use('/game', gameController);
 app.use('', registrationController);
 
 app.get('/', (req, res) => {
-    res.render('HealthCheck', {title: "Health Check for Story Cards Services", message: "Services are healthy!"});
+    const contentType = req.header("Content-Type");
+    if (contentType === "application/json") {
+        healthCheckUtils.pingRedisServer(function (result) {
+            res.status(200).send({
+                "Redis": result,
+                "MySQL": "UP"
+            })
+        });
+    } else {
+        healthCheckUtils.pingRedisServer(function (result) {
+            res.render('HealthCheck', {
+                title: "Health Check for Story Cards Services",
+                message: "Services are healthy!",
+                serviceList: [{
+                    "name": "Redis",
+                    "status": result
+                }, {
+                    "name": "MySQL",
+                    "status": "UP"
+                }]
+            });
+        });
+    }
 })
 app.use(function (req, res, next) {
     next(createError(404, "Page not found!", {expose: false}));
