@@ -42,5 +42,21 @@ module.exports = {
     },
     generateAccessToken: function (payload) {
         return jwt.sign({payload}, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '1d'});
-    }
+    },
+    objectsAreEqual: function (a, b) {
+        for (var prop in a) {
+          if (a.hasOwnProperty(prop)) {
+            if (b.hasOwnProperty(prop)) {
+              if (typeof a[prop] === 'object') {
+                if (!objectsAreEqual(a[prop], b[prop])) return false;
+              } else {
+                if (a[prop] !== b[prop]) return false;
+              }
+            } else {
+              return false;
+            }
+          }
+        }
+        return true;
+      }
 }

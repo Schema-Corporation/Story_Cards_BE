@@ -1,4 +1,5 @@
-const redis = require('../config/RedisConfig')
+const redis = require('../config/RedisConfig');
+const securityUtil = require('./SecurityUtil');
 
 
 module.exports = {
@@ -28,18 +29,32 @@ module.exports = {
         });
     },
     getPositionFromRedisList: function (key, elementToFind, callback) {
-        redis.getRedisClient().lpos(key, elementToFind, function (err, elementPosition) {
+        redis.getRedisClient().lrange(key, 0, -1, function (err, reply) {
             if (err) {
                 console.log(err);
-                callback(undefined);
-            } else if (elementPosition === undefined || elementPosition === null || elementPosition < 0) {
-                console.log(elementPosition);
-                callback(null);
+                callback([]);
+            } else if (reply === undefined || reply === null || reply.length < 1) {
+                callback([]);
             } else {
-                console.log(elementPosition);
-                callback(elementPosition);
+                var elementPosition = -1;
+                let parsedReply = new Array(0);
+                reply.forEach(rawReply => parsedReply.push(JSON.parse(rawReply)));
+                parsedReply.forEach((rawParsedReply, index) => {
+                    let elementToFindAsObject = JSON.parse(elementToFind);
+                    if (securityUtil.objectsAreEqual(rawParsedReply, elementToFindAsObject)) {
+                        elementPosition = index;
+                    }
+                });
+                if (elementPosition === undefined || elementPosition === null || elementPosition < 0) {
+                    console.log(elementPosition);
+                    callback(null);
+                } else {
+                    console.log(elementPosition);
+                    callback(elementPosition);
+                }
             }
         });
+
     },
     getItemFromRedisListInSpecifiedIndex: function (key, index, callback) {
         redis.getRedisClient().lindex(key, index, function (err, foundItem) {
