@@ -44,19 +44,23 @@ module.exports = {
         return jwt.sign({payload}, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '1d'});
     },
     objectsAreEqual: function (a, b) {
-        for (var prop in a) {
-          if (a.hasOwnProperty(prop)) {
+        return objectsAreEqualRecursively(a, b);
+    }
+}
+
+function objectsAreEqualRecursively(a, b) {
+    for (var prop in a) {
+        if (a.hasOwnProperty(prop)) {
             if (b.hasOwnProperty(prop)) {
-              if (typeof a[prop] === 'object') {
-                if (!objectsAreEqual(a[prop], b[prop])) return false;
-              } else {
-                if (a[prop] !== b[prop]) return false;
-              }
+            if (typeof a[prop] === 'object') {
+                if (!objectsAreEqualRecursively(a[prop], b[prop])) return false;
             } else {
-              return false;
+                if (a[prop] !== b[prop]) return false;
             }
-          }
+            } else {
+                return false;
+            }
         }
-        return true;
-      }
+    }
+    return true;
 }
