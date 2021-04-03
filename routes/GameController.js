@@ -16,6 +16,17 @@ router.ws('/challenges-host-approval/ws/:gameId', function (ws, req) {
     challengesHostGuestRoom[req.params.gameId] = challengesHostGuestRoom[req.params.gameId] || [];
     challengesHostGuestRoom[req.params.gameId].push(ws);
 
+    let interval = setInterval(() => {
+        let responseObject = {
+            operation: 'ping',
+        }
+        if (challengesHostGuestRoom[req.params.gameId] != null && challengesHostGuestRoom[req.params.gameId].length > 0) {
+            challengesHostGuestRoom[req.params.gameId].forEach(client => {
+                client.send(JSON.stringify(responseObject));
+            });
+        }
+      }, 20000);
+
     ws.on('close', function () {
         let index = challengesHostGuestRoom[req.params.gameId].indexOf(ws);
         if (index !== -1) {
@@ -30,6 +41,17 @@ router.ws('/challenges-host-approval/ws/:gameId', function (ws, req) {
 router.ws('/challenges-approval/ws/:guestId', function (ws, req) {
     challengesApprovalGuestRoom[req.params.guestId] = challengesApprovalGuestRoom[req.params.guestId] || [];
     challengesApprovalGuestRoom[req.params.guestId].push(ws);
+
+    let interval = setInterval(() => {
+        let responseObject = {
+            operation: 'ping',
+        }
+        if (challengesApprovalGuestRoom[req.params.guestId] != null && challengesApprovalGuestRoom[req.params.guestId].length > 0) {
+            challengesApprovalGuestRoom[req.params.guestId].forEach(client => {
+                client.send(JSON.stringify(responseObject));
+            });
+        }
+      }, 20000);
 
     ws.on('close', function () {
         let index = challengesApprovalGuestRoom[req.params.guestId].indexOf(ws);
@@ -46,6 +68,17 @@ router.ws('/game-waiting-game/ws/:gameId', function (ws, req) {
 
     guestWaitingGame[req.params.gameId] = guestWaitingGame[req.params.gameId] || [];
     guestWaitingGame[req.params.gameId].push(ws);
+
+    let interval = setInterval(() => {
+        let responseObject = {
+            operation: 'ping',
+        }
+        if (guestWaitingGame[req.params.gameId] != null && guestWaitingGame[req.params.gameId].length > 0) {
+            guestWaitingGame[req.params.gameId].forEach(client => {
+                client.send(JSON.stringify(responseObject));
+            });
+        }
+      }, 20000);
 
     ws.on('close', function () {
         let index = guestWaitingGame[req.params.gameId].indexOf(ws);
@@ -78,6 +111,17 @@ router.ws('/game-waiting-room/ws/:roomId', function (ws, req) {
     guestWaitingRoom[req.params.roomId] = guestWaitingRoom[req.params.roomId] || [];
     guestWaitingRoom[req.params.roomId].push(ws);
 
+    let interval = setInterval(() => {
+        let responseObject = {
+            operation: 'ping',
+        }
+        if (guestWaitingRoom[req.params.roomId] != null && guestWaitingRoom[req.params.roomId].length > 0) {
+            guestWaitingRoom[req.params.roomId].forEach(client => {
+                client.send(JSON.stringify(responseObject));
+            });
+        }
+      }, 20000);
+
     ws.on('close', function () {
         let index = guestWaitingRoom[req.params.roomId].indexOf(ws);
         if (index !== -1) {
@@ -109,6 +153,17 @@ router.ws('/game-waiting-scores/ws/:roomId', function (ws, req) {
     guestWaitingScores[req.params.roomId] = guestWaitingScores[req.params.roomId] || [];
     guestWaitingScores[req.params.roomId].push(ws);
 
+    let interval = setInterval(() => {
+        let responseObject = {
+            operation: 'ping',
+        }
+        if (guestWaitingScores[req.params.roomId] != null && guestWaitingScores[req.params.roomId].length > 0) {
+            guestWaitingScores[req.params.roomId].forEach(client => {
+                client.send(JSON.stringify(responseObject));
+            });
+        }
+      }, 20000);
+
     ws.on('close', function () {
         let index = guestWaitingScores[req.params.roomId].indexOf(ws);
         if (index !== -1) {
@@ -125,6 +180,17 @@ router.ws('/notify-finish-game/ws/:gameId', function (ws, req) {
 
     guestFinishGame[gameId] = guestFinishGame[gameId] || [];
     guestFinishGame[gameId].push(ws);
+
+    let interval = setInterval(() => {
+        let responseObject = {
+            operation: 'ping',
+        }
+        if (guestFinishGame[gameId] != null && guestFinishGame[gameId].length > 0) {
+            guestFinishGame[gameId].forEach(client => {
+                client.send(JSON.stringify(responseObject));
+            });
+        }
+      }, 20000);
 
     ws.on('close', function () {
         let index = guestFinishGame[gameId].indexOf(ws);
@@ -301,6 +367,17 @@ router.ws('/evaluate-answers/ws/:gameId', function (ws, req) {
 
     answersRoom[req.params.gameId] = answersRoom[req.params.gameId] || [];
     answersRoom[req.params.gameId].push(ws);
+
+    let interval = setInterval(() => {
+        let responseObject = {
+            operation: 'ping',
+        }
+        if (answersRoom[req.params.gameId] != null && answersRoom[req.params.gameId].length > 0) {
+            answersRoom[req.params.gameId].forEach(client => {
+                client.send(JSON.stringify(responseObject));
+            });
+        }
+      }, 20000);
 
     ws.on('close', function () {
         let index = answersRoom[req.params.gameId].indexOf(ws);

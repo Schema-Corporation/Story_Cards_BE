@@ -150,7 +150,7 @@ router.ws('/guests/ws/:roomId', function (ws, req) {
                 client.send(JSON.stringify(responseObject));
             });
         }
-      }, 3000);
+      }, 20000);
 
     ws.on('close', function () {
         let index = guestListClients[req.params.roomId].indexOf(ws);
