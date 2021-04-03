@@ -141,6 +141,17 @@ router.ws('/guests/ws/:roomId', function (ws, req) {
     guestListClients[req.params.roomId] = guestListClients[req.params.roomId] || [];
     guestListClients[req.params.roomId].push(ws);
 
+    let interval = setInterval(() => {
+        let responseObject = {
+            operation: 'ping',
+        }
+        if (guestListClients[req.params.roomId] != null && guestListClients[req.params.roomId].length > 0) {
+            guestListClients[req.params.roomId].forEach(client => {
+                client.send(JSON.stringify(responseObject));
+            });
+        }
+      }, 3000);
+
     ws.on('close', function () {
         let index = guestListClients[req.params.roomId].indexOf(ws);
         if (index !== -1) {
