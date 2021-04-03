@@ -17,14 +17,14 @@ module.exports = {
         redis.getRedisClient().lrange(key, 0, -1, function (err, reply) {
             if (err) {
                 console.log(err);
-                response([]);
+                return response([]);
             } else if (reply === undefined || reply === null || reply.length < 1) {
-                response([]);
+                return response([]);
             } else {
-                console.log(reply);
+                console.log("Retrieved list from redis with key:" + key + " with the following result:", reply);
                 let parsedReply = new Array(0);
                 reply.forEach(rawReply => parsedReply.push(JSON.parse(rawReply)));
-                response(parsedReply);
+                return response(parsedReply);
             }
         });
     },

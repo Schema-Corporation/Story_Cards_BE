@@ -229,8 +229,7 @@ router.post('/challenges-reject/:gameId/guest/:guestId', securityUtils.authentic
                         client.send(JSON.stringify(responseObject));
                     });
                 }
-                res.status(200);
-                res.send({"operationResult": result});
+                res.status(200).send({"operationResult": result});
             }
         });
     }

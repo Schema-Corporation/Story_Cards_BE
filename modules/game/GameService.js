@@ -38,7 +38,7 @@ module.exports = {
     },
     deleteChallenge: function (gameId, guestId, response) {
         redisOperations.getRedisList(gameId, function (searchResult) {
-            console.log(searchResult);
+            console.log("Got the following result from find operation for list with key : " + gameId + " result: " + searchResult);
             if (searchResult.length === 0) {
                 console.log("Could not find redis list with given key or list is empty");
                 return response(undefined);
@@ -55,7 +55,7 @@ module.exports = {
                         console.log("Could not find any challenge with given Id!");
                         return response(null);
                     }
-                })
+                });
             }
         });
     },
