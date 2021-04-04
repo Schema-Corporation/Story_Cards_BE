@@ -257,7 +257,7 @@ router.put('/challenges/:gameId', securityUtils.authenticateToken, (req, res) =>
     } else if (Object.keys(req.body).length === 0) {
         res.status(422).send({"error": "Body cannot be null!"});
     } else {
-        gameService.editChallengeStatus(gameId, requestBody.guestId, requestBody.status, requestBody.points, function (result) {
+        gameService.editChallengeStatus(gameId, requestBody.challengeId, requestBody.status, requestBody.points, function (result) {
             let responseObject = {
                 operation: 'challenge-approved'
             }
@@ -278,25 +278,18 @@ router.post('/challenges-reject/:gameId/guest/:guestId', securityUtils.authentic
     if (gameId === null || gameId === undefined) {
         res.status(422).send({"error": "Game Id must not be null"});
     } else {
-        gameService.deleteChallenge(gameId, guestId, function (result) {
-            if (result === null) {
-                res.status(422);
-                res.send({"error": "Could not find any challenge with given guest ID!"});
-            } else if (result === undefined) {
-                res.status(422);
-                res.send({"error": "Redis List is empty for the given key!"})
-            } else {
-                let responseObject = {
-                    operation: 'challenge-rejected',
-                    reason: requestBody.reason
-                }
-                if (challengesApprovalGuestRoom[guestId] != null && challengesApprovalGuestRoom[guestId].length > 0) {
-                    challengesApprovalGuestRoom[guestId].forEach(client => {
-                        client.send(JSON.stringify(responseObject));
-                    });
-                }
-                res.status(200).send({"operationResult": result});
+        gameService.editChallengeStatus(gameId, requestBody.challengeId, requestBody.status, requestBody.points, function (result) {
+            let responseObject = {
+                operation: 'challenge-rejected',
+                reason: requestBody.reason
             }
+            if (challengesApprovalGuestRoom[guestId] != null && challengesApprovalGuestRoom[guestId].length > 0) {
+                challengesApprovalGuestRoom[guestId].forEach(client => {
+                    client.send(JSON.stringify(responseObject));
+                });
+            }
+            res.status(200);
+            res.send(result);
         });
     }
 });

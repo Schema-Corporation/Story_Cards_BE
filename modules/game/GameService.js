@@ -10,7 +10,7 @@ module.exports = {
         let auxList = [];
         auxList.push(challengeRequest.gameId);
         auxList.push(JSON.stringify({
-            "challengeId": uuid.v4(),
+            "challengeId": challengeRequest.challengeId,
             "guestId": challengeRequest.guestId,
             "fullName": challengeRequest.fullName,
             "challengeBody": challengeRequest.challengeBody,
@@ -22,11 +22,11 @@ module.exports = {
     getChallengesFromWaitingRoom: function (gameId, callback) {
         redisOperations.getRedisList(gameId, callback);
     },
-    editChallengeStatus: function (gameId, guestId, status, points, callback) {
+    editChallengeStatus: function (gameId, challengeId, status, points, callback) {
         redisOperations.getRedisList(gameId, function (result) {
             result.forEach(challenge => {
                 console.log(challenge);
-                if (challenge.guestId === guestId) {
+                if (challenge.challengeId === challengeId) {
                     redisOperations.getPositionFromRedisList(gameId, JSON.stringify(challenge), function (findResult) {
                         challenge.status = status;
                         challenge.points = points;
