@@ -14,6 +14,8 @@ const roomController = require('./routes/RoomController');
 const gameController = require('./routes/GameController');
 const registrationController = require('./routes/RegistrationController');
 const healthCheckUtils = require('./modules/utils/HealthCheck');
+const cron = require('node-cron');
+const databaseConfig = require('./modules/config/DatabaseConfig');
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
@@ -65,7 +67,19 @@ app.use(function (err, req, res, next) {
     res.status(err.status || 500);
     res.render('error');
 });
-
+cron.schedule('59 59 23 * * *', () => {
+    console.log('Job executed at ->', new Date())
+    console.log('Disabling rooms...');
+    const enabled = 0;
+    databaseConfig.getSession().query('UPDATE room r SET r.enabled = ?', [enabled], (err, result) => {
+        if (err) {
+            console.log('Something went wrong...');
+            console.log(err);
+        }
+        console.log('Rooms have been disabled successfully...');
+    });
+    databaseConfig.closeConnection();
+});
 app.listen(port, () => {
     console.log(`Story Cards Server listening at http://localhost:${port}`)
 })
