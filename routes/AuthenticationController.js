@@ -27,5 +27,16 @@ router.get('/validate-role', securityUtils.authenticateToken, (req, res) => {
         res.status(500).send({"Error": "Could not validate role"});
     }
 });
+router.get('/check-user-activity', securityUtils.authenticateToken, (req, res) => {
+    const guestId = req.claims.payload.guestId;
+    const roomId = req.claims.payload.roomId;
+    authenticationService.checkActivity(guestId, roomId, function (value) {
+        if (value) {
+            res.status(200).send(true);
+        } else {
+            res.status(500).send({"Error": "Could not validate role"});
+        }
+    });
+});
 
 module.exports = router;

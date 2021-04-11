@@ -28,6 +28,18 @@ module.exports = {
         });
         databaseConfig.closeConnection();
     },
+    checkActivity: function (guestId, roomId, callback) {
+        databaseConfig.getSession().query('select r.user_id from room r join guest g on r.id = g.room_id where r.id = ? and r.enabled = 1 and g.id = ?', [roomId, guestId], (err, rows) => {
+            if (err) return callback(err);
+            let rawResult = rows[0];
+            if (rawResult === undefined) {
+                return callback(false);
+            } else {
+                return callback(true);
+            }
+        });
+        databaseConfig.closeConnection();
+    },
     registerUser: function (userData, callback) {
         let insertObject = {
             id: uuid.v4(),

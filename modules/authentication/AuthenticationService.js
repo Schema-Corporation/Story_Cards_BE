@@ -29,6 +29,16 @@ module.exports = {
                 return callback(null);
             }
         });
+    },
+    checkActivity: function (guestId, roomId, callback) {
+        return authenticationRepository.checkActivity(guestId, roomId, function (validationResult) {
+            if (validationResult) {
+                return callback(true);
+            } else {
+                console.log("Error in user activity");
+                return callback(false);
+            }
+        });
     }
 }
 
