@@ -128,7 +128,7 @@ router.post('/validate-room-entering/', securityUtils.authenticateToken, (req, r
             res.status(422).send({"error": result.error});
         } else {
             var allowParticipant = false;
-            if (result.active_guests < 6) {
+            if (result.active_guests < process.env.MAX_PARTICIPANTS) {
                 allowParticipant = true;
             }
             res.status(200).send(allowParticipant);
