@@ -47,7 +47,7 @@ module.exports = {
     objectsAreEqual: function (a, b) {
         return objectsAreEqualRecursively(a, b);
     },
-    sendCode: function (email, randomCode, callback) {
+    sendCode: function (email, randomCode, firstName, lastName, callback) {
         var transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
@@ -58,8 +58,11 @@ module.exports = {
         const mailOptions = {
             from: 'storycards.upc@gmail.com',
             to: email,
-            subject: 'Storycards - UPC - Recuperación de contraseña',
-            html: 'Hemos recibido una solicitud de recuperación de contraseña, su código generado es <strong>' + randomCode + '</strong>.'
+            subject: 'Recuperación de contraseña de acceso a la aplicación web StoryCards',
+            html: 'Estimado(a) <span style="text-transform: uppercase;">' + firstName + ' ' + lastName + ':</span> <br><br>' + 
+            'Hemos recibido una solicitud de recuperación de contraseña, su código generado es <strong>' + randomCode + '</strong>. <br><br>' +
+            'Que tenga un buen día, <br>' +
+            'Editorial UPC'
           };
           
         transporter.sendMail(mailOptions, function(error, info){

@@ -66,7 +66,7 @@ module.exports = {
     updateCode : function (email, randomCode, callback) {
         databaseConfig.getSession().query('UPDATE user SET otp = ? WHERE username = ?', [randomCode, email], (err, result) => {
             if (err) return callback(err);
-            return callback(true);
+            return this.findUserByUsername(email, callback);
         });
         databaseConfig.closeConnection();
     },

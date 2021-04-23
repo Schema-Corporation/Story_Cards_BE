@@ -78,17 +78,13 @@ module.exports = {
     sendCode: function (userData, callback) {
         var randomCode = generateRandomCode();
         return userRepository.updateCode(userData.email, randomCode, function(userUpdated) {
-            if (userUpdated) {
-                securityUtils.sendCode(userData.email, randomCode, function (codeSent) {
-                    if (codeSent === null) {
-                        return callback(null);
-                    } else {
-                        return callback(true);
-                    }
-                })
-            } else {
-                return callback(null);
-            }
+            securityUtils.sendCode(userData.email, randomCode, userUpdated.firstName, userUpdated.lastName, function (codeSent) {
+                if (codeSent === null) {
+                    return callback(null);
+                } else {
+                    return callback(true);
+                }
+            })
         });
     },
     validateOTP: function (userData, callback) {
