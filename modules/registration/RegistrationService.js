@@ -65,5 +65,63 @@ module.exports = {
                 }
             })
         })
+    },
+    validateEmail: function (userData, callback) {
+        return userRepository.findUserByUsername(userData.email, function (userExists) {
+            if (userExists === null) {
+                return callback(null);
+            } else {
+                return callback(true);
+            }
+        })
+    },
+    sendCode: function (userData, callback) {
+        var randomCode = generateRandomCode();
+        return userRepository.updateCode(userData.email, randomCode, function(userUpdated) {
+            if (userUpdated) {
+                securityUtils.sendCode(userData.email, randomCode, function (codeSent) {
+                    if (codeSent === null) {
+                        return callback(null);
+                    } else {
+                        return callback(true);
+                    }
+                })
+            } else {
+                return callback(null);
+            }
+        });
+    },
+    validateOTP: function (userData, callback) {
+        return userRepository.validateOTP(userData.email, userData.otp, function(validOTP) {
+            if (validOTP === null || validOTP === false) {
+                return callback(null);
+            } else {
+                return callback(true);
+            }
+        });
+    },
+    resetPassword: function (userData, callback) {
+        securityUtils.hashPassword(userData.password, function (hashedPassword) {
+            userRepository.updateUserPassword(userData.email, hashedPassword, function (updatedResult) {
+                if (updatedResult === null) {
+                    return callback(null);
+                } else {
+                    return callback(true);
+                }
+            })
+        });
     }
+}
+
+function generateRandomCode() {
+    let str = "";
+    let counter = 0;
+    while (counter < 6) {
+        let randomNum = Math.random() * 127;
+        if ((randomNum >= 48 && randomNum <= 57) || (randomNum >= 65 && randomNum <= 90) || (randomNum >= 97 && randomNum <= 122)) {
+            str += String.fromCharCode(Math.round(randomNum));
+            counter++;
+        }
+    }
+    return str;
 }

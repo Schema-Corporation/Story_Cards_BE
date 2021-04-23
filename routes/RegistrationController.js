@@ -39,4 +39,44 @@ router.post('/register', (req, res) => {
         }
     );
 })
+router.post('/validate-email', (req, res) => {
+    const body = req.body;
+    registrationService.validateEmail(body, function (result) {
+        if (result != null) {
+            res.status(200).send(result);
+        } else {
+            res.status(500).send({"error": "User not found"});
+        }
+    })
+})
+router.post('/send-code', (req, res) => {
+    const body = req.body;
+    registrationService.sendCode(body, function (result) {
+        if (result != null) {
+            res.status(200).send(result);
+        } else {
+            res.status(500).send({"error": "Internal Server Error"});
+        }
+    })
+})
+router.post('/validate-otp', (req, res) => {
+    const body = req.body;
+    registrationService.validateOTP(body, function (result) {
+        if (result != null) {
+            res.status(200).send(result);
+        } else {
+            res.status(500).send({"error": "Internal Server Error"});
+        }
+    })
+})
+router.post('/reset-password', (req, res) => {
+    const body = req.body;
+    registrationService.resetPassword(body, function (result) {
+        if (result != null) {
+            res.status(200).send(result);
+        } else {
+            res.status(500).send({"error": "Internal Server Error"});
+        }
+    })
+})
 module.exports = router;

@@ -62,5 +62,31 @@ module.exports = {
             return this.findUserByUsername(userData.username, callback);
         });
         databaseConfig.closeConnection();
+    },
+    updateCode : function (email, randomCode, callback) {
+        databaseConfig.getSession().query('UPDATE user SET otp = ? WHERE username = ?', [randomCode, email], (err, result) => {
+            if (err) return callback(err);
+            return callback(true);
+        });
+        databaseConfig.closeConnection();
+    },
+    validateOTP: function (email, otp, callback) {
+        databaseConfig.getSession().query('select u.id from user u where u.username = ? and u.otp = ?', [email, otp], (err, rows) => {
+            if (err) return callback(err);
+            let rawResult = rows[0];
+            if (rawResult === undefined) {
+                return callback(false);
+            } else {
+                return callback(true);
+            }
+        });
+        databaseConfig.closeConnection();
+    },
+    updateUserPassword: function (email, password, callback) {
+        databaseConfig.getSession().query('UPDATE user SET password = ? WHERE username = ?', [password, email], (err, result) => {
+            if (err) return callback(err);
+            return callback(true);
+        });
+        databaseConfig.closeConnection();
     }
 }

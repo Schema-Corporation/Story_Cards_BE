@@ -2,6 +2,7 @@ require('dotenv').config();
 const jwt = require("jsonwebtoken");
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
+const nodemailer = require('nodemailer');
 
 module.exports = {
     authenticateToken: function (req, res, next) {
@@ -45,6 +46,31 @@ module.exports = {
     },
     objectsAreEqual: function (a, b) {
         return objectsAreEqualRecursively(a, b);
+    },
+    sendCode: function (email, randomCode, callback) {
+        var transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: "storycards.upc@gmail.com",
+                pass: "storycards!1"
+            }
+        })
+        const mailOptions = {
+            from: 'storycards.upc@gmail.com',
+            to: email,
+            subject: 'Storycards - UPC - Recuperación de contraseña',
+            html: 'Hemos recibido una solicitud de recuperación de contraseña, su código generado es <strong>' + randomCode + '</strong>'
+          };
+          
+        transporter.sendMail(mailOptions, function(error, info){
+            if (error) {
+                console.log('Error sending mail: ' + error);
+                return callback(null);
+            } else {
+                console.log('Email sent: ' + info.response);
+                return callback(true);
+            }
+        });
     }
 }
 
