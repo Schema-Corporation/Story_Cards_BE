@@ -59,7 +59,7 @@ module.exports = {
             from: 'storycards.upc@gmail.com',
             to: email,
             subject: 'Storycards - UPC - Recuperación de contraseña',
-            html: 'Hemos recibido una solicitud de recuperación de contraseña, su código generado es <strong>' + randomCode + '</strong>'
+            html: 'Hemos recibido una solicitud de recuperación de contraseña, su código generado es <strong>' + randomCode + '</strong>.'
           };
           
         transporter.sendMail(mailOptions, function(error, info){
