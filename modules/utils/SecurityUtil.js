@@ -51,21 +51,21 @@ module.exports = {
         var transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
-                user: "storycards.upc@gmail.com",
-                pass: "storycards!1"
+                user: process.env.OTP_EMAIL_USER,
+                pass: process.env.OTP_EMAIL_PASSWORD
             }
         })
         const mailOptions = {
-            from: 'storycards.upc@gmail.com',
+            from: process.env.OTP_EMAIL_USER,
             to: email,
             subject: 'Recuperación de contraseña de acceso a la aplicación web StoryCards',
-            html: 'Estimado(a) <span style="text-transform: uppercase;">' + firstName + ' ' + lastName + ':</span> <br><br>' + 
-            'Hemos recibido una solicitud de recuperación de contraseña, su código generado es <strong>' + randomCode + '</strong>. <br><br>' +
-            'Que tenga un buen día, <br>' +
-            'Editorial UPC'
-          };
-          
-        transporter.sendMail(mailOptions, function(error, info){
+            html: 'Estimado(a) <span style="text-transform: uppercase;">' + firstName + ' ' + lastName + ':</span> <br><br>' +
+                'Hemos recibido una solicitud de recuperación de contraseña, su código generado es <strong>' + randomCode + '</strong>. <br><br>' +
+                'Que tenga un buen día, <br>' +
+                'Editorial UPC'
+        };
+
+        transporter.sendMail(mailOptions, function (error, info) {
             if (error) {
                 console.log('Error sending mail: ' + error);
                 return callback(null);
@@ -81,11 +81,11 @@ function objectsAreEqualRecursively(a, b) {
     for (var prop in a) {
         if (a.hasOwnProperty(prop)) {
             if (b.hasOwnProperty(prop)) {
-            if (typeof a[prop] === 'object') {
-                if (!objectsAreEqualRecursively(a[prop], b[prop])) return false;
-            } else {
-                if (a[prop] !== b[prop]) return false;
-            }
+                if (typeof a[prop] === 'object') {
+                    if (!objectsAreEqualRecursively(a[prop], b[prop])) return false;
+                } else {
+                    if (a[prop] !== b[prop]) return false;
+                }
             } else {
                 return false;
             }
