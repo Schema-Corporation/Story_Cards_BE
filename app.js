@@ -13,6 +13,7 @@ const canvasController = require('./routes/CanvasController');
 const roomController = require('./routes/RoomController');
 const gameController = require('./routes/GameController');
 const registrationController = require('./routes/RegistrationController');
+const userController = require('./routes/UsersController');
 const healthCheckUtils = require('./modules/utils/HealthCheck');
 const cron = require('node-cron');
 const databaseConfig = require('./modules/config/DatabaseConfig');
@@ -31,6 +32,7 @@ app.use('/canvas', canvasController);
 app.use('/room', roomController);
 app.use('/game', gameController);
 app.use('', registrationController);
+app.use('/users', userController);
 
 app.get('/', (req, res) => {
     const contentType = req.header("Content-Type");

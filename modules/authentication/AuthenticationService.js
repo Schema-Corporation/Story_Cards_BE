@@ -17,7 +17,8 @@ module.exports = {
                                     "userId": user.id
                                 }
                             }),
-                            "fullName": user.fullName
+                            "fullName": user.fullName,
+                            "isAdmin": user.isAdmin
                         });
                     } else {
                         console.log("Password did not match!");

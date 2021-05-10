@@ -32,6 +32,15 @@ module.exports = {
             return callback(hash);
         });
     },
+    hashOTP: function (otp, callback) {
+        bcrypt.hash(otp, saltRounds, (err, hash) => {
+            if (err) {
+                console.log("Could not hash OTP following error happened: " + err);
+                throw err;
+            }
+            return callback(hash);
+        });
+    },
     compareStrings: function (rawString, hashedString, callback) {
         bcrypt.compare(rawString, hashedString, function (err, res) {
             if (err) {

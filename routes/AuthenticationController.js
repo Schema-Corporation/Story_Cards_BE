@@ -11,7 +11,7 @@ router.post('/login', (req, res) => {
     const password = credentials.split(":")[1]
     authenticationService.signIn(user, password, function (value) {
         if (value != null) {
-            res.send({"token": value.token, "fullName": value.fullName});
+            res.send({"token": value.token, "fullName": value.fullName, "isAdmin": value.isAdmin});
         } else {
             res.status(401).send("User and Password do not match!");
         }
