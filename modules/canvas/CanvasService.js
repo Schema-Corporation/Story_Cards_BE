@@ -1,4 +1,4 @@
-const canvasRepository = require('../repository/canvasRepository.js')
+const canvasRepository = require('../repository/CanvasRepository.js')
 const errorUtils = require('../utils/ErrorConstants')
 module.exports = {
     getCanvas: function (userId, response) {

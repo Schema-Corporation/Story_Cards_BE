@@ -1,8 +1,7 @@
 if (process.env.NODE_ENV !== 'production') {
     require('dotenv').config();
 }
-const jwt = require("jsonwebtoken");
-const authenticationRepository = require('../repository/userRepository.js')
+const authenticationRepository = require('../repository/UserRepository.js')
 const securityUtil = require('../utils/SecurityUtil')
 module.exports = {
     signIn: function (username, password, callback) {
@@ -11,12 +10,15 @@ module.exports = {
                 securityUtil.compareStrings(password, user.password, function (validationResult) {
                     if (validationResult) {
                         return callback({
-                            "token": generateAccessToken({
-                                "username": user.username,
-                                "fullName": user.fullName,
-                                "userId": user.id
+                            "token": securityUtil.generateAccessToken({
+                                "user": {
+                                    "username": user.username,
+                                    "fullName": user.fullName,
+                                    "userId": user.id
+                                }
                             }),
-                            "user": user
+                            "fullName": user.fullName,
+                            "isAdmin": user.isAdmin
                         });
                     } else {
                         console.log("Password did not match!");
@@ -28,9 +30,16 @@ module.exports = {
                 return callback(null);
             }
         });
+    },
+    checkActivity: function (guestId, roomId, callback) {
+        return authenticationRepository.checkActivity(guestId, roomId, function (validationResult) {
+            if (validationResult) {
+                return callback(true);
+            } else {
+                console.log("Error in user activity");
+                return callback(false);
+            }
+        });
     }
 }
 
-function generateAccessToken(user) {
-    return jwt.sign({user}, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '1d'});
-}

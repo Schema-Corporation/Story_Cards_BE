@@ -1,7 +1,7 @@
 const LocalDate = require("@js-joda/core");
-const bookCodeRepository = require('../repository/bookCodeRepository.js');
-const userRepository = require('../repository/userRepository.js');
-const accessAttemptRepository = require('../repository/accessAttemptsRepository.js');
+const bookCodeRepository = require('../repository/BookCodeRepository.js');
+const userRepository = require('../repository/UserRepository.js');
+const accessAttemptRepository = require('../repository/AccessAttemptsRepository.js');
 const errorUtils = require('../utils/ErrorConstants');
 const securityUtils = require('../utils/SecurityUtil');
 
@@ -65,5 +65,62 @@ module.exports = {
                 }
             })
         })
+    },
+    validateEmail: function (userData, callback) {
+        return userRepository.findUserByUsername(userData.email, function (userExists) {
+            if (userExists === null) {
+                return callback(null);
+            } else {
+                return callback(true);
+            }
+        })
+    },
+    sendCode: function (userData, callback) {
+        var randomCode = generateRandomCode();
+        securityUtils.hashOTP(randomCode, hashedCode => {
+            return userRepository.updateCode(userData.email, hashedCode, function(userUpdated) {
+                console.log('User updated: ', userUpdated);
+                securityUtils.sendCode(userData.email, randomCode, userUpdated.firstName, userUpdated.lastName, function (codeSent) {
+                    if (codeSent === null) {
+                        return callback(null);
+                    } else {
+                        return callback(true);
+                    }
+                })
+            });
+        });
+    },
+    validateOTP: function (userData, callback) {
+        return userRepository.validateOTP(userData.email, userData.otp, function(validOTP) {
+            if (validOTP === null || validOTP === false) {
+                return callback(null);
+            } else {
+                return callback(true);
+            }
+        });
+    },
+    resetPassword: function (userData, callback) {
+        securityUtils.hashPassword(userData.password, function (hashedPassword) {
+            userRepository.updateUserPassword(userData.email, hashedPassword, function (updatedResult) {
+                if (updatedResult === null) {
+                    return callback(null);
+                } else {
+                    return callback(true);
+                }
+            })
+        });
     }
+}
+
+function generateRandomCode() {
+    let str = "";
+    let counter = 0;
+    while (counter < 6) {
+        let randomNum = Math.random() * 127;
+        if ((randomNum >= 48 && randomNum <= 57) || (randomNum >= 65 && randomNum <= 90) || (randomNum >= 97 && randomNum <= 122)) {
+            str += String.fromCharCode(Math.round(randomNum));
+            counter++;
+        }
+    }
+    return str;
 }

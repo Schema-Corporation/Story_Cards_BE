@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const securityUtils = require('../modules/utils/SecurityUtil');
-const canvasService = require('../modules/canvas/canvasService');
+const canvasService = require('../modules/canvas/CanvasService');
 const errorUtils = require('../modules/utils/ErrorConstants');
 
 router.get('/', securityUtils.authenticateToken, (req, res) => {
-    const userId = req.claims.user.userId;
+    const userId = req.claims.payload.user.userId;
     canvasService.getCanvas(userId, function (result) {
         const responseObject = result;
         if (responseObject.error === null) {
@@ -16,7 +16,7 @@ router.get('/', securityUtils.authenticateToken, (req, res) => {
     });
 });
 router.post('/', securityUtils.authenticateToken, (req, res) => {
-    const userId = req.claims.user.userId;
+    const userId = req.claims.payload.user.userId;
     if (Object.keys(req.body).length === 0) {
         res.status(422).send({"error": "Body cannot be null!"});
     } else {
@@ -30,7 +30,7 @@ router.post('/', securityUtils.authenticateToken, (req, res) => {
     }
 });
 router.get('/:canvasId', securityUtils.authenticateToken, (req, res) => {
-    const userId = req.claims.user.userId;
+    const userId = req.claims.payload.user.userId;
     const params = req.params
     const canvasId = params.canvasId;
     if (canvasId === null || canvasId === undefined) {
@@ -47,7 +47,7 @@ router.get('/:canvasId', securityUtils.authenticateToken, (req, res) => {
     });
 });
 router.put('/:canvasId', securityUtils.authenticateToken, (req, res) => {
-    const userId = req.claims.user.userId;
+    const userId = req.claims.payload.user.userId;
     const params = req.params
     const canvasId = params.canvasId;
     if (canvasId === null || canvasId === undefined) {
@@ -66,7 +66,7 @@ router.put('/:canvasId', securityUtils.authenticateToken, (req, res) => {
     }
 });
 router.delete('/:canvasId', securityUtils.authenticateToken, (req, res) => {
-    const userId = req.claims.user.userId;
+    const userId = req.claims.payload.user.userId;
     const params = req.params
     const canvasId = params.canvasId;
     if (canvasId === null || canvasId === undefined) {

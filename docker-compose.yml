@@ -2,7 +2,7 @@ version: '3.7'
 services:
   database:
     image: mysql
-    restart: on-failure
+    restart: 'no'
     environment:
       MYSQL_DATABASE: 'db_story_cards'
       MYSQL_USER: 'user'
@@ -14,3 +14,10 @@ services:
     expose:
       - '3307'
       - '33070'
+  cache:
+    image: redis
+    restart: 'no'
+    ports:
+      - '6379:6379'
+    expose:
+      - '6379'

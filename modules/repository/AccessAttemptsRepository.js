@@ -1,4 +1,4 @@
-const databaseConfig = require('../config/database');
+const databaseConfig = require('../config/DatabaseConfig');
 const uuid = require('uuid');
 const LocalDate = require("@js-joda/core").LocalDate;
 
